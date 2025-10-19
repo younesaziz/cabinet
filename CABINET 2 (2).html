@@ -10,10 +10,11 @@
       --card:#ffffff;
       --text:#0f172a;
       --muted:#64748b;
-      --accent:#2563eb; /* modern blue accent */
+      --accent:#0ea5a4;
+      --accent-rgb:14,165,164;
       --accent-contrast:#ffffff;
       --border:rgba(2,6,23,0.08);
-      --ring:rgba(37,99,235,0.45);
+      --ring:rgba(var(--accent-rgb),0.45);
       --radius:12px;
       --shadow-sm:0 1px 2px rgba(2,6,23,0.06);
       --shadow-md:0 8px 30px rgba(2,6,23,0.08);
@@ -23,10 +24,11 @@
       --card:rgba(255,255,255,0.03);
       --text:#e2e8f0;
       --muted:#94a3b8;
-      --accent:#3b82f6;
-      --accent-contrast:#001133;
+      --accent:#2dd4bf;
+      --accent-rgb:45,212,191;
+      --accent-contrast:#ffffff;
       --border:rgba(255,255,255,0.08);
-      --ring:rgba(59,130,246,0.40);
+      --ring:rgba(var(--accent-rgb),0.40);
       --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
       --shadow-md:0 12px 40px rgba(0,0,0,0.35);
     }
@@ -49,7 +51,7 @@
     label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
     input,select,textarea,button{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:inherit;font-size:14px;transition:border-color .2s, box-shadow .2s, background-color .2s}
     input::placeholder,textarea::placeholder{color:var(--muted)}
-    input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;border-color:rgba(37,99,235,0.55);box-shadow:0 0 0 3px var(--ring)}
+    input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;border-color:rgba(var(--accent-rgb),0.55);box-shadow:0 0 0 3px var(--ring)}
     [data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{border:1px solid var(--border);background:rgba(255,255,255,0.02)}
     
     /* Grid responsive */
@@ -68,22 +70,22 @@
     table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
     thead th{position:sticky;top:0;background:var(--bg);z-index:1}
     th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
-    tbody tr:hover{background:rgba(37,99,235,0.05)}
-    [data-theme="dark"] tbody tr:hover{background:rgba(59,130,246,0.08)}
+    tbody tr:hover{background:rgba(var(--accent-rgb),0.06)}
+    [data-theme="dark"] tbody tr:hover{background:rgba(var(--accent-rgb),0.10)}
     
     /* Table responsive */
     .table-container{overflow-x:auto}
     .mobile-table{display:none}
     
-    .pill{display:inline-block;padding:6px 8px;border-radius:999px;background:rgba(37,99,235,0.08);font-size:12px;margin:2px;border:1px solid rgba(37,99,235,0.15)}
+    .pill{display:inline-block;padding:6px 8px;border-radius:999px;background:rgba(var(--accent-rgb),0.08);font-size:12px;margin:2px;border:1px solid rgba(var(--accent-rgb),0.15)}
     .small{font-size:12px;color:var(--muted)}
     .muted{color:var(--muted)}
     .topbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .hidden{display:none !important}
-    .badge{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#ffffff;padding:6px 8px;border-radius:8px;font-size:12px;box-shadow:0 2px 8px rgba(37,99,235,0.35)}
+    .badge{background:linear-gradient(135deg,#0fb5b4,#0ea5a4);color:#ffffff;padding:6px 8px;border-radius:8px;font-size:12px;box-shadow:0 2px 8px rgba(var(--accent-rgb),0.35)}
     .danger{background:#b91c1c;color:#ffffff}
-    .notice{background:linear-gradient(180deg, rgba(37,99,235,0.06), rgba(37,99,235,0.03));padding:10px;border-radius:10px;margin-bottom:10px;font-size:13px;border:1px solid var(--border)}
-    [data-theme="dark"] .notice{background:linear-gradient(180deg, rgba(59,130,246,0.10), rgba(59,130,246,0.05))}
+    .notice{background:linear-gradient(180deg, rgba(var(--accent-rgb),0.06), rgba(var(--accent-rgb),0.03));padding:10px;border-radius:10px;margin-bottom:10px;font-size:13px;border:1px solid var(--border)}
+    [data-theme="dark"] .notice{background:linear-gradient(180deg, rgba(var(--accent-rgb),0.10), rgba(var(--accent-rgb),0.05))}
     
     /* Search responsive */
     .search-row{display:flex;gap:8px;flex-wrap:wrap}
@@ -130,7 +132,7 @@
       margin-bottom: 10px;
     }
     .associate-item:hover {
-      background: rgba(14, 165, 164, 0.05) !important;
+      background: rgba(var(--accent-rgb), 0.05) !important;
     }
     .remove-associate {
       color: #dc2626 !important;
@@ -161,7 +163,7 @@
     }
     .file-upload:hover {
       border-color: var(--accent);
-      background: rgba(14, 165, 164, 0.05);
+      background: rgba(var(--accent-rgb), 0.05);
     }
     .file-preview {
       max-width: 100px;
@@ -423,7 +425,7 @@
     }
   </style>
   <!-- Performance & theming -->
-  <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0ea5a4" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -435,19 +437,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
 /* Sidebar layout */
-:root{--accent:#2563eb;--bg-light:var(--bg);--card:var(--card);--text:var(--text);--muted:var(--muted)}
+:root{--accent:#0ea5a4;--accent-rgb:14,165,164;--bg-light:var(--bg);--card:var(--card);--text:var(--text);--muted:var(--muted)}
 body{font-family:Inter,'Poppins',system-ui,Segoe UI,Roboto,Arial;background:var(--bg-light);color:var(--text);transition:background .25s}
 .app-shell{display:flex;min-height:100vh;gap:18px}
 .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
 .sidebar{width:260px;background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,255,255,0.95));border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-md);position:relative;flex-shrink:0;border:1px solid var(--border)}
 .sidebar .brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.sidebar .brand .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#e0ecff,#ecf3ff);display:flex;align-items:center;justify-content:center;font-weight:800;color:#1e40af;font-size:16px;box-shadow:inset 0 0 0 1px rgba(30,64,175,0.15)}
+.sidebar .brand .logo{width:44px;height:44px;border-radius:var(--radius);background:linear-gradient(135deg, rgba(var(--accent-rgb),0.20), rgba(var(--accent-rgb),0.10));display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:16px;box-shadow:inset 0 0 0 1px rgba(var(--accent-rgb),0.15)}
 .sidebar h3{margin:0;font-size:16px}
 .menu{margin-top:12px;display:flex;flex-direction:column;gap:8px}
 .menu a{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;color:var(--text);text-decoration:none;border:1px solid transparent;transition:background .2s, border-color .2s}
 .menu a .ico{width:20px;height:20px;flex-shrink:0;color:var(--accent)}
-.menu a:hover{background:rgba(37,99,235,0.08);border-color:rgba(37,99,235,0.12)}
-.menu a.active{background:linear-gradient(90deg, rgba(37,99,235,0.12), rgba(37,99,235,0.06));box-shadow:inset 0 0 0 1px rgba(37,99,235,0.10)}
+.menu a:hover{background:rgba(var(--accent-rgb),0.08);border-color:rgba(var(--accent-rgb),0.12)}
+.menu a.active{background:linear-gradient(90deg, rgba(var(--accent-rgb),0.12), rgba(var(--accent-rgb),0.06));box-shadow:inset 0 0 0 1px rgba(var(--accent-rgb),0.10)}
 .sidebar .bottom{position:absolute;left:16px;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px}
 .toggle-btn{display:none}
 .content-wrap{flex:1}
@@ -1814,7 +1816,7 @@ LES FONDATEURS :
           <h1 style="text-align:center;margin-bottom:30px">RÉSUMÉ D'IDENTITÉ - ${company.name}</h1>
           
           <div style="margin-bottom:20px;border:2px solid #333;padding:20px;border-radius:10px">
-            <h2 style="color:#0ea5a4;border-bottom:2px solid #0ea5a4;padding-bottom:10px">INFORMATIONS GÉNÉRALES</h2>
+            <h2 style="color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:10px">INFORMATIONS GÉNÉRALES</h2>
             <table style="width:100%;border-collapse:collapse;margin-top:15px">
               <tr>
                 <td style="padding:10px;border:1px solid #ccc;width:30%"><strong>Dénomination :</strong></td>
@@ -1844,7 +1846,7 @@ LES FONDATEURS :
           </div>
           
           <div style="margin-bottom:20px;border:2px solid #333;padding:20px;border-radius:10px">
-            <h2 style="color:#0ea5a4;border-bottom:2px solid #0ea5a4;padding-bottom:10px">INFORMATIONS DU GÉRANT</h2>
+            <h2 style="color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:10px">INFORMATIONS DU GÉRANT</h2>
             <table style="width:100%;border-collapse:collapse;margin-top:15px">
               <tr>
                 <td style="padding:10px;border:1px solid #ccc;width:30%"><strong>Nom complet :</strong></td>
@@ -1863,7 +1865,7 @@ LES FONDATEURS :
           
           ${company.associates && company.associates.length > 0 ? `
           <div style="margin-bottom:20px;border:2px solid #333;padding:20px;border-radius:10px">
-            <h2 style="color:#0ea5a4;border-bottom:2px solid #0ea5a4;padding-bottom:10px">ASSOCIÉS</h2>
+            <h2 style="color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:10px">ASSOCIÉS</h2>
             <table style="width:100%;border-collapse:collapse;margin-top:15px">
               <thead>
                 <tr style="background:#f5f5f5">
