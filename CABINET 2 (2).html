@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Cabinet Comptable</title>
   <style>
     :root{--bg:#f6f8fa;--card:#ffffff;--text:#0b1220;--accent:#0ea5a4;--muted:#475569}
@@ -19,6 +19,7 @@
     .card{background:var(--card);padding:clamp(12px, 3vw, 16px);border-radius:10px;margin-bottom:14px;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
     label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
     input,select,textarea,button{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:transparent;color:inherit;font-size:14px}
+    input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(14,165,164,.35);outline-offset:2px}
     [data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{border:1px solid rgba(255,255,255,0.04)}
     
     /* Grid responsive */
@@ -27,6 +28,7 @@
     
     .row{display:flex;gap:10px;flex-wrap:wrap}
     .btn{cursor:pointer;border:none;padding:8px 12px;border-radius:8px;background:var(--accent);color:#022;max-width:240px;font-size:14px;white-space:nowrap}
+    .btn:focus-visible{outline:3px solid rgba(14,165,164,.5);outline-offset:2px}
     .btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--muted)}
     .btn.small{padding:6px 10px;font-size:12px}
     
@@ -386,8 +388,11 @@
       .societe-action-btn{width:100%}
     }
   </style>
+  <!-- Performance hints -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <!-- Include html2pdf library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
 
 <!-- Fonts & sidebar styles -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -396,6 +401,7 @@
 :root{--accent:#0ea5a4;--bg-light:#fbfdfe;--card:#ffffff;--text:#0b1220;--muted:#64748b}
 body{font-family:'Poppins',Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg-light);color:var(--text);transition:background .25s}
 .app-shell{display:flex;min-height:100vh;gap:20px}
+.visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
 .sidebar{width:260px;background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,255,255,0.95));border-radius:12px;padding:16px;box-shadow:0 8px 30px rgba(2,6,23,0.06);position:relative;flex-shrink:0}
 .sidebar .brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
 .sidebar .brand .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#ecfeff,#e6fffb);display:flex;align-items:center;justify-content:center;font-weight:700;color:#065f5a;font-size:16px}
@@ -484,10 +490,17 @@ body{font-family:'Poppins',Inter,system-ui,Segoe UI,Roboto,Arial;background:var(
             </select>
             <div id="currentCabinetBadge" class="cabinet-badge hidden"></div>
           </div>
-          <label class="small">Thème</label>
+          <label class="small" for="themeSelect">Thème</label>
           <select id="themeSelect" style="max-width:120px">
             <option value="dark">Sombre</option>
             <option value="light">Clair</option>
+          </select>
+          <label class="small" for="localeSelect">Format</label>
+          <select id="localeSelect" style="max-width:140px">
+            <option value="fr-FR|EUR">Europe (fr-FR, EUR)</option>
+            <option value="en-US|USD">US (en-US, USD)</option>
+            <option value="en-GB|GBP">UK (en-GB, GBP)</option>
+            <option value="ar-MA|MAD">Maroc (ar-MA, MAD)</option>
           </select>
           <div id="userBadge" class="badge small">Admin</div>
           <button id="logoutBtn" class="btn ghost small">Logout</button>
@@ -752,11 +765,11 @@ body{font-family:'Poppins',Inter,system-ui,Segoe UI,Roboto,Arial;background:var(
           </div>
 
           <div>
-            <label>Capital social (DH)</label>
+            <label>Capital social</label>
             <input id="companyCapital" type="number" />
           </div>
           <div>
-            <label>Valeur part (DH)</label>
+            <label>Valeur part</label>
             <input id="shareValue" type="number" value="100" />
           </div>
           <div>
@@ -895,7 +908,7 @@ body{font-family:'Poppins',Inter,system-ui,Segoe UI,Roboto,Arial;background:var(
               <input id="cessionPartsCount" type="number" placeholder="Ex: 100" />
             </div>
             <div>
-              <label>Prix de cession (DH)</label>
+              <label>Prix de cession</label>
               <input id="cessionPrice" type="number" placeholder="Montant en dirhams" />
             </div>
             <div class="full-width">
@@ -994,6 +1007,7 @@ body{font-family:'Poppins',Inter,system-ui,Segoe UI,Roboto,Arial;background:var(
       TPL: 'cabinet_templates', 
       REM: 'cabinet_reminders', 
       THEME: 'cabinet_theme',
+      LOCALE: 'cabinet_locale',
       CESSIONS: 'cabinet_cessions',
       CABINETS: 'cabinet_cabinets',
       CURRENT_CABINET: 'cabinet_current'
@@ -1140,6 +1154,33 @@ LES FONDATEURS :
     let cabinets = load(LS_KEYS.CABINETS, []);
     let currentCabinetId = localStorage.getItem(LS_KEYS.CURRENT_CABINET) || '';
     let theme = localStorage.getItem(LS_KEYS.THEME) || 'dark';
+    let localePref = localStorage.getItem(LS_KEYS.LOCALE) || 'fr-FR|EUR';
+    let [activeLocale, activeCurrency] = localePref.split('|');
+
+    // Intl formatters
+    function formatCurrency(value) {
+      const num = Number(value || 0);
+      try {
+        return new Intl.NumberFormat(activeLocale, { style: 'currency', currency: activeCurrency }).format(num);
+      } catch(_e) {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+      }
+    }
+    function formatNumber(value) {
+      const num = Number(value || 0);
+      try {
+        return new Intl.NumberFormat(activeLocale).format(num);
+      } catch(_e) {
+        return new Intl.NumberFormat('en-US').format(num);
+      }
+    }
+    function formatDateISO(iso) {
+      try {
+        return new Date(iso).toLocaleDateString(activeLocale);
+      } catch(_e) {
+        return new Date(iso).toLocaleDateString();
+      }
+    }
 
     // DOM Elements
     const loginSection = document.getElementById('loginSection');
@@ -1224,6 +1265,7 @@ LES FONDATEURS :
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
     const fileInput = document.getElementById('fileInput');
+    const localeSelect = document.getElementById('localeSelect');
 
     // Company form fields
     const companyFormTitle = document.getElementById('companyFormTitle');
@@ -1281,6 +1323,8 @@ LES FONDATEURS :
     function initUI() {
       setTheme(theme);
       themeSelect.value = theme;
+      // init locale
+      localeSelect.value = `${activeLocale}|${activeCurrency}`;
 
       // Fill legal types
       legalType.innerHTML = '';
@@ -1396,7 +1440,7 @@ LES FONDATEURS :
               <span class="societe-detail-label">Gérant:</span> ${company.manager || 'Non renseigné'}
             </div>
             <div class="societe-detail-item">
-              <span class="societe-detail-label">Capital:</span> ${company.capital ? company.capital + ' DH' : 'Non renseigné'}
+              <span class="societe-detail-label">Capital:</span> ${company.capital ? formatCurrency(company.capital) : 'Non renseigné'}
             </div>
             <div class="societe-detail-item">
               <span class="societe-detail-label">Date création:</span> ${company.date || 'Non renseignée'}
@@ -1580,7 +1624,7 @@ LES FONDATEURS :
             <span class="societe-detail-label">ICE:</span> ${company.ice || 'Non renseigné'}
           </div>
           <div class="societe-detail-item">
-            <span class="societe-detail-label">Date création:</span> ${company.date || 'Non renseignée'}
+            <span class="societe-detail-label">Date création:</span> ${company.date ? formatDateISO(company.date) : 'Non renseignée'}
           </div>
           <div class="societe-detail-item">
             <span class="societe-detail-label">Gérant:</span> ${company.manager || 'Non renseigné'}
@@ -1592,10 +1636,10 @@ LES FONDATEURS :
             <span class="societe-detail-label">${company.managerNationality === 'marocain' ? 'CIN:' : 'Passeport:'}</span> ${company.managerNationality === 'marocain' ? company.managerCIN : company.managerPassport}
           </div>
           <div class="societe-detail-item">
-            <span class="societe-detail-label">Capital social:</span> ${company.capital ? company.capital + ' DH' : 'Non renseigné'}
+            <span class="societe-detail-label">Capital social:</span> ${company.capital ? formatCurrency(company.capital) : 'Non renseigné'}
           </div>
           <div class="societe-detail-item">
-            <span class="societe-detail-label">Valeur part:</span> ${company.shareValue || '100'} DH
+            <span class="societe-detail-label">Valeur part:</span> ${company.shareValue ? formatCurrency(company.shareValue) : formatCurrency(100)}
           </div>
           <div class="societe-detail-item">
             <span class="societe-detail-label">Téléphone:</span> ${company.phone || 'Non renseigné'}
@@ -1674,12 +1718,12 @@ LES FONDATEURS :
           <div style="text-align:center;margin-bottom:30px">
             <p><strong>${getLegalTypeLabel(company.type)} - RC: ${company.rc || 'Non renseigné'}</strong></p>
             <p>Gérant: ${company.manager || 'Non renseigné'}</p>
-            <p>Date de création: ${company.date || 'Non renseignée'}</p>
-            <p>Capital social: ${company.capital || 'Non renseigné'} DH</p>
+            <p>Date de création: ${company.date ? formatDateISO(company.date) : 'Non renseignée'}</p>
+            <p>Capital social: ${company.capital ? formatCurrency(company.capital) : 'Non renseigné'}</p>
           </div>
           <pre style="white-space:pre-wrap;font-family:inherit;line-height:1.5">${content}</pre>
           <div style="margin-top:40px;font-size:12px;color:#666">
-            <p>Document généré le ${new Date().toLocaleDateString()} - Cabinet Comptable</p>
+            <p>Document généré le ${formatDateISO(new Date().toISOString())} - Cabinet Comptable</p>
           </div>
         </div>
       `;
@@ -1711,11 +1755,11 @@ LES FONDATEURS :
           <div style="text-align:center;margin-bottom:30px">
             <p><strong>${getLegalTypeLabel(company.type)} - RC: ${company.rc || 'Non renseigné'}</strong></p>
             <p>Gérant: ${company.manager || 'Non renseigné'}</p>
-            <p>Date: ${new Date().toLocaleDateString()}</p>
+            <p>Date: ${formatDateISO(new Date().toISOString())}</p>
           </div>
           <pre style="white-space:pre-wrap;font-family:inherit;line-height:1.5">${content}</pre>
           <div style="margin-top:40px;font-size:12px;color:#666">
-            <p>Document généré le ${new Date().toLocaleDateString()} - Cabinet Comptable</p>
+            <p>Document généré le ${formatDateISO(new Date().toISOString())} - Cabinet Comptable</p>
           </div>
         </div>
       `;
@@ -1753,11 +1797,11 @@ LES FONDATEURS :
               </tr>
               <tr>
                 <td style="padding:10px;border:1px solid #ccc"><strong>Date de création :</strong></td>
-                <td style="padding:10px;border:1px solid #ccc">${company.date || 'Non renseignée'}</td>
+                <td style="padding:10px;border:1px solid #ccc">${company.date ? formatDateISO(company.date) : 'Non renseignée'}</td>
               </tr>
               <tr>
                 <td style="padding:10px;border:1px solid #ccc"><strong>Capital social :</strong></td>
-                <td style="padding:10px;border:1px solid #ccc">${company.capital || 'Non renseigné'} DH</td>
+                <td style="padding:10px;border:1px solid #ccc">${company.capital ? formatCurrency(company.capital) : 'Non renseigné'}</td>
               </tr>
             </table>
           </div>
@@ -1809,7 +1853,7 @@ LES FONDATEURS :
           ` : ''}
           
           <div style="margin-top:40px;text-align:center;font-size:12px;color:#666">
-            <p>Document généré le ${new Date().toLocaleDateString()} - Cabinet Comptable</p>
+            <p>Document généré le ${formatDateISO(new Date().toISOString())} - Cabinet Comptable</p>
           </div>
         </div>
       `;
@@ -2222,11 +2266,11 @@ Les Associés :
         
         sharesInput.value = shares;
         amountInput.value = amount.toFixed(2);
-        summarySpan.textContent = `Parts: ${shares} | Montant: ${amount.toFixed(2)} DH`;
+        summarySpan.textContent = `Parts: ${shares} | Montant: ${formatCurrency(amount)}`;
       } else {
         sharesInput.value = 0;
         amountInput.value = 0;
-        summarySpan.textContent = `Parts: 0 | Montant: 0 DH`;
+        summarySpan.textContent = `Parts: 0 | Montant: ${formatCurrency(0)}`;
       }
     }
 
@@ -2253,8 +2297,8 @@ Les Associés :
       if (associates.length > 0) {
         capitalSummary.style.display = 'block';
         document.getElementById('totalShares').textContent = totalShares;
-        document.getElementById('coveredCapital').textContent = totalCovered.toFixed(2) + ' DH';
-        document.getElementById('remainingCapital').textContent = remaining.toFixed(2) + ' DH';
+        document.getElementById('coveredCapital').textContent = formatCurrency(totalCovered);
+        document.getElementById('remainingCapital').textContent = formatCurrency(remaining);
         
         const warning = document.getElementById('capitalWarning');
         if (Math.abs(remaining) > 1 || totalPercentage > 100) {
@@ -2913,8 +2957,8 @@ LES ASSOCIÉS FONDATEURS :
           <td>${c.cedant}</td>
           <td>${c.cessionnaire}</td>
           <td>${c.partsCount}</td>
-          <td>${c.price.toLocaleString()} DH</td>
-          <td>${c.date}</td>
+          <td>${formatCurrency(c.price)}</td>
+          <td>${formatDateISO(c.date)}</td>
           <td>
             <div class="action-buttons">
               <button class="btn small ghost" onclick="editCession('${c.id}')">Éditer</button>
@@ -3021,7 +3065,7 @@ LES ASSOCIÉS FONDATEURS :
           <h1 style="text-align:center;margin-bottom:30px">DOCUMENT D'IDENTITÉ - CESSIONNAIRE</h1>
           ${cinContent}
           <div style="margin-top:30px;text-align:center;font-size:12px;color:#666">
-            <p>Document généré le ${new Date().toLocaleDateString()} - Cabinet Comptable</p>
+            <p>Document généré le ${formatDateISO(new Date().toISOString())} - Cabinet Comptable</p>
           </div>
         </div>
       `;
@@ -3103,10 +3147,7 @@ LES ASSOCIÉS FONDATEURS :
             <p>Le CÉDANT cède au CESSIONNAIRE, qui l'accepte, ${cession.partsCount} parts sociales de la société <strong>${cession.companyName}</strong>, représentant une partie du capital social de ladite société.</p>
           </div>
           
-          <div style="margin-bottom:15px">
-            <p><strong>ARTICLE 2 - PRIX</strong></p>
-            <p>Le prix de la cession est fixé à la somme de <strong>${cession.price.toLocaleString()} Dirhams (${cession.price} DH)</strong>.</p>
-          </div>
+          <div style=\"margin-bottom:15px\">\n            <p><strong>ARTICLE 2 - PRIX</strong></p>\n            <p>Le prix de la cession est fixé à la somme de <strong>${formatCurrency(cession.price)}</strong>.</p>\n          </div>
           
           <div style="margin-bottom:15px">
             <p><strong>ARTICLE 3 - MODALITÉS DE PAIEMENT</strong></p>
@@ -3126,7 +3167,7 @@ LES ASSOCIÉS FONDATEURS :
           </div>
           
           <div style="margin-top:40px">
-            <p>Fait à ________, le ${cession.date}</p>
+            <p>Fait à ________, le ${formatDateISO(cession.date)}</p>
             
             <div style="display:flex;justify-content:space-between;margin-top:60px">
               <div style="text-align:center">
@@ -3503,6 +3544,17 @@ LES ASSOCIÉS FONDATEURS :
     // Theme
     themeSelect.addEventListener('change', (e) => {
       setTheme(e.target.value);
+    });
+    localeSelect.addEventListener('change', (e) => {
+      const [loc, curr] = e.target.value.split('|');
+      activeLocale = loc; activeCurrency = curr;
+      localStorage.setItem(LS_KEYS.LOCALE, `${activeLocale}|${activeCurrency}`);
+      // Re-render views that show formatted values
+      refreshCounts();
+      renderCompaniesTable(getCurrentCabinetCompanies());
+      renderCessionsTable();
+      refreshSocietesList();
+      renderReminders();
     });
 
     function setTheme(newTheme) {
