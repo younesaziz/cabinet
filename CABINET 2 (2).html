@@ -1,0 +1,3920 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cabinet Comptable</title>
+  <style>
+    :root{--bg:#f6f8fa;--card:#ffffff;--text:#0b1220;--accent:#0ea5a4;--muted:#475569}
+    [data-theme="dark"]{--bg:#071026;--card:rgba(255,255,255,0.03);--text:#e6eef6;--accent:#0ea5a4;--muted:#94a3b8}
+    *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    body{margin:0;background:var(--bg);color:var(--text);padding:12px}
+    .container{max-width:1100px;margin:0 auto}
+    
+    /* Header responsive */
+    header{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
+    .header-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+    h1{margin:0;font-size:clamp(18px, 4vw, 22px);text-align:center}
+    
+    .card{background:var(--card);padding:clamp(12px, 3vw, 16px);border-radius:10px;margin-bottom:14px;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+    label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+    input,select,textarea,button{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:transparent;color:inherit;font-size:14px}
+    [data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{border:1px solid rgba(255,255,255,0.04)}
+    
+    /* Grid responsive */
+    .grid{display:grid;gap:10px}
+    .grid.cols-2{grid-template-columns:repeat(auto-fit, minmax(300px, 1fr))}
+    
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{cursor:pointer;border:none;padding:8px 12px;border-radius:8px;background:var(--accent);color:#022;max-width:240px;font-size:14px;white-space:nowrap}
+    .btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--muted)}
+    .btn.small{padding:6px 10px;font-size:12px}
+    
+    .list{max-height:320px;overflow:auto}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:8px;border-bottom:1px solid rgba(0,0,0,0.06);text-align:left}
+    [data-theme="dark"] th, [data-theme="dark"] td{border-bottom:1px solid rgba(255,255,255,0.03)}
+    
+    /* Table responsive */
+    .table-container{overflow-x:auto}
+    .mobile-table{display:none}
+    
+    .pill{display:inline-block;padding:6px 8px;border-radius:999px;background:rgba(0,0,0,0.04);font-size:12px;margin:2px}
+    .small{font-size:12px;color:var(--muted)}
+    .muted{color:var(--muted)}
+    .topbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .hidden{display:none !important}
+    .badge{background:#06262b;padding:6px 8px;border-radius:8px;font-size:12px}
+    .danger{background:#7f1d1d}
+    .notice{background:#e6f6f5;padding:8px;border-radius:8px;margin-bottom:10px;font-size:13px}
+    [data-theme="dark"] .notice{background:#042c20}
+    
+    /* Search responsive */
+    .search-row{display:flex;gap:8px;flex-wrap:wrap}
+    .search-row input,.search-row select{min-width:150px;flex:1}
+    .flex{display:flex;gap:8px;flex-wrap:wrap}
+    
+    /* Action buttons responsive */
+    .action-buttons{display:flex;gap:6px;flex-wrap:wrap}
+    .action-buttons .btn{max-width:none;flex:1;min-width:80px}
+    
+    /* Mobile cards for companies */
+    .mobile-company-card{display:none;background:var(--card);padding:12px;border-radius:8px;margin-bottom:10px;border:1px solid rgba(0,0,0,0.06)}
+    .mobile-company-card .company-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+    .mobile-company-card .company-name{font-weight:600;font-size:14px}
+    .mobile-company-card .company-type{font-size:12px;color:var(--muted)}
+    .mobile-company-card .company-details{font-size:12px;margin-bottom:8px}
+    .mobile-company-card .company-actions{display:flex;gap:6px;flex-wrap:wrap}
+    
+    /* Dashboard stats responsive */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));gap:10px;margin-top:10px}
+    .stat-card{background:var(--card);padding:12px;border-radius:8px;text-align:center;border:1px solid rgba(0,0,0,0.06)}
+    .stat-number{font-size:20px;font-weight:bold;color:var(--accent)}
+    .stat-label{font-size:12px;color:var(--muted);margin-top:4px}
+    
+    /* Form responsive improvements */
+    .form-grid{display:grid;gap:10px}
+    .form-grid.cols-2{grid-template-columns:repeat(auto-fit, minmax(280px, 1fr))}
+    .full-width{grid-column:1/-1}
+    
+    /* Print styles */
+    @media print{
+      body *{visibility:hidden}
+      #printable, #printable *{visibility:visible}
+      #printable{position:fixed;left:0;top:0;width:100%}
+    }
+    
+    /* Cabinet selector */
+    .cabinet-selector{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .cabinet-badge{background:var(--accent);color:white;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:500}
+    
+    /* Associates styles */
+    .associate-item {
+      transition: all 0.2s ease;
+      margin-bottom: 10px;
+    }
+    .associate-item:hover {
+      background: rgba(14, 165, 164, 0.05) !important;
+    }
+    .remove-associate {
+      color: #dc2626 !important;
+      border-color: #dc2626 !important;
+    }
+    .remove-associate:hover {
+      background: #dc2626 !important;
+      color: white !important;
+    }
+    .associate-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .associate-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .file-upload {
+      border: 2px dashed rgba(0,0,0,0.1);
+      padding: 15px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .file-upload:hover {
+      border-color: var(--accent);
+      background: rgba(14, 165, 164, 0.05);
+    }
+    .file-preview {
+      max-width: 100px;
+      max-height: 80px;
+      border-radius: 6px;
+      margin: 5px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    .file-preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .nationality-section {
+      background: rgba(0,0,0,0.02);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .pdf-icon {
+      background: #dc2626;
+      color: white;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .document-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Nouveaux styles pour la section sociétés */
+    .societe-card {
+      background: var(--card);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+    }
+    .societe-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+    .societe-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .societe-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--accent);
+      margin: 0;
+    }
+    .societe-badge {
+      background: var(--accent);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .societe-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .societe-detail-item {
+      font-size: 13px;
+    }
+    .societe-detail-label {
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .societe-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .societe-action-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .societe-action-btn.primary {
+      background: var(--accent);
+      color: white;
+    }
+    .societe-action-btn.secondary {
+      background: rgba(0,0,0,0.05);
+      color: var(--text);
+    }
+    .societe-action-btn.danger {
+      background: #dc2626;
+      color: white;
+    }
+    .societe-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .societe-stat-item {
+      text-align: center;
+      padding: 10px;
+      background: rgba(0,0,0,0.02);
+      border-radius: 8px;
+    }
+    .societe-stat-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--accent);
+    }
+    .societe-stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .modal-content {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-title {
+      margin: 0;
+      color: var(--accent);
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--muted);
+    }
+
+    /* Quick actions */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .quick-action-card {
+      background: var(--card);
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .quick-action-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .quick-action-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    .quick-action-text {
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    /* ========== MEDIA QUERIES ========== */
+    
+    /* Tablets */
+    @media (max-width: 1024px) {
+      body{padding:10px}
+      .container{max-width:100%}
+      .grid.cols-2{grid-template-columns:1fr}
+      .header-top{flex-direction:column;align-items:stretch;text-align:center}
+      .topbar{justify-content:center}
+      .societe-details{grid-template-columns:1fr}
+    }
+    
+    /* Mobile Large */
+    @media (max-width: 768px) {
+      body{padding:8px}
+      .card{padding:12px;margin-bottom:10px}
+      
+      /* Switch to mobile table view */
+      .desktop-table{display:none}
+      .mobile-table{display:block}
+      
+      /* Button groups */
+      .action-buttons{flex-direction:column}
+      .action-buttons .btn{max-width:100%}
+      
+      /* Search row */
+      .search-row{flex-direction:column}
+      .search-row input,.search-row select{min-width:auto}
+      
+      /* Header adjustments */
+      h1{font-size:20px}
+      
+      /* Form improvements */
+      .form-grid.cols-2{grid-template-columns:1fr}
+      input,select,textarea,button{font-size:16px}
+
+      /* Societes responsive */
+      .societe-header{flex-direction:column;gap:10px}
+      .societe-actions{justify-content:center}
+      .quick-actions{grid-template-columns:1fr}
+    }
+    
+    /* Mobile Small */
+    @media (max-width: 480px) {
+      body{padding:6px}
+      .card{padding:10px;margin-bottom:8px}
+      
+      /* Stats grid */
+      .stats-grid{grid-template-columns:1fr 1fr}
+      
+      /* Button sizes */
+      .btn{padding:10px 14px;font-size:14px}
+
+      /* Societes mobile */
+      .societe-actions{flex-direction:column}
+      .societe-action-btn{width:100%}
+    }
+  </style>
+  <!-- Include html2pdf library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- Fonts & sidebar styles -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Sidebar layout */
+:root{--accent:#0ea5a4;--bg-light:#fbfdfe;--card:#ffffff;--text:#0b1220;--muted:#64748b}
+body{font-family:'Poppins',Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg-light);color:var(--text);transition:background .25s}
+.app-shell{display:flex;min-height:100vh;gap:20px}
+.sidebar{width:260px;background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,255,255,0.95));border-radius:12px;padding:16px;box-shadow:0 8px 30px rgba(2,6,23,0.06);position:relative;flex-shrink:0}
+.sidebar .brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.sidebar .brand .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#ecfeff,#e6fffb);display:flex;align-items:center;justify-content:center;font-weight:700;color:#065f5a;font-size:16px}
+.sidebar h3{margin:0;font-size:16px}
+.menu{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.menu a{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;color:var(--text);text-decoration:none;border:1px solid transparent}
+.menu a .ico{width:20px;height:20px;flex-shrink:0;color:var(--accent)}
+.menu a:hover{background:rgba(14,165,164,0.06);border-color:rgba(14,165,164,0.06)}
+.menu a.active{background:linear-gradient(90deg, rgba(14,165,164,0.12), rgba(14,165,164,0.06));box-shadow:inset 0 0 0 1px rgba(14,165,164,0.06)}
+.sidebar .bottom{position:absolute;left:16px;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px}
+.toggle-btn{display:none}
+.content-wrap{flex:1}
+.header-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.header-bar .left{display:flex;align-items:center;gap:12px}
+.header-bar .actions{display:flex;gap:8px;align-items:center}
+.logo-small{display:none}
+
+/* Responsive */
+@media (max-width: 900px){
+  .app-shell{flex-direction:column}
+  .sidebar{width:100%;display:flex;flex-direction:row;align-items:center;padding:10px;overflow:auto;border-radius:10px}
+  .menu{flex-direction:row;gap:6px;margin-left:10px}
+  .menu a{padding:8px;border-radius:8px;font-size:13px}
+  .logo-small{display:block}
+  .toggle-btn{display:inline-block}
+  .sidebar .bottom{position:static;margin-top:8px;flex-direction:row}
+}
+.splash-overlay{position:fixed;left:0;top:0;width:100%;height:100%;background:linear-gradient(180deg,#ffffff,#ecfdfd);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .6s ease}
+.splash-inner{text-align:center}
+.splash-logo{font-size:28px;font-weight:800;color:var(--accent);letter-spacing:-0.5px}
+.splash-sub{margin-top:8px;color:var(--muted)}
+.splash-hidden{opacity:0;pointer-events:none;visibility:hidden}
+
+/* Adjust cards/content inside .content-wrap to match original layout */
+.content-wrap .container{max-width:1200px;margin:0 auto;padding:12px}
+</style>
+
+</head>
+<body data-theme="dark">
+<!-- Splash Screen -->
+<div id="splash" class="splash-overlay" aria-hidden="false">
+  <div class="splash-inner">
+    <div class="splash-logo">CABINET DE COMPTABILITE</div>
+    <div class="splash-sub">Chargement... <small style="display:block;margin-top:6px;color:var(--muted)">Bienvenue dans votre application</small></div>
+  </div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">CC</div>
+      <div>
+        <h3>CABINET DE COMPTABILITE</h3>
+        <div class="small muted">Cabinet local</div>
+      </div>
+    </div>
+
+    <nav class="menu" id="mainMenu">
+      <a href="#" data-target="dashboard" class="active"><span class="ico">🏠</span><span class="label">Tableau de bord</span></a>
+      <a href="#" data-target="cabinet"><span class="ico">🏢</span><span class="label">Cabinets</span></a>
+      <a href="#" data-target="societes"><span class="ico">🏛️</span><span class="label">Sociétés</span></a>
+      <a href="#" data-target="modeles"><span class="ico">📄</span><span class="label">Modèles</span></a>
+      <a href="#" data-target="cessions"><span class="ico">🔁</span><span class="label">Cessions</span></a>
+      <a href="#" data-target="rappels"><span class="ico">⏰</span><span class="label">Rappels</span></a>
+      <a href="#" data-target="parametres"><span class="ico">⚙️</span><span class="label">Paramètres</span></a>
+    </nav>
+
+    <div class="bottom">
+      <button id="themeToggle" class="btn ghost small">Mode sombre</button>
+      <button id="logoutSidebar" class="btn small">Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="content-wrap">
+    <!-- The original container will follow here -->
+
+  <div class="container">
+    <header>
+      <div class="header-top">
+        <h1 id="mainTitle">Cabinet Comptable </h1>
+        <div class="topbar">
+          <div class="cabinet-selector">
+            <label class="small">Cabinet</label>
+            <select id="cabinetSelect" style="max-width:150px">
+              <option value="">Choisir un cabinet</option>
+            </select>
+            <div id="currentCabinetBadge" class="cabinet-badge hidden"></div>
+          </div>
+          <label class="small">Thème</label>
+          <select id="themeSelect" style="max-width:120px">
+            <option value="dark">Sombre</option>
+            <option value="light">Clair</option>
+          </select>
+          <div id="userBadge" class="badge small">Admin</div>
+          <button id="logoutBtn" class="btn ghost small">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <div id="loginSection" class="card">
+      <h2>Connexion Admin</h2>
+      <p class="small muted">Identifiant par défaut : <strong>admin</strong> / Mot de passe : <strong>admin123</strong></p>
+      <div>
+        <label>Identifiant</label>
+        <input id="loginUser" value="admin" />
+        <label>Mot de passe</label>
+        <input id="loginPass" type="password" value="admin123" />
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button id="loginBtn" class="btn" style="flex:1">Se connecter</button>
+          <button id="initBtn" class="btn ghost" style="flex:1">Données exemple</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="app" class="hidden">
+      <!-- Cabinet Management -->
+      <div class="card">
+        <h3>Gestion des Cabinets</h3>
+        <div class="form-grid cols-2">
+          <div>
+            <label>Nom du cabinet</label>
+            <input id="cabinetName" placeholder="Ex: Cabinet XYZ" />
+          </div>
+          <div>
+            <label>Adresse</label>
+            <input id="cabinetAddress" placeholder="Adresse du cabinet" />
+          </div>
+          <div>
+            <label>Téléphone</label>
+            <input id="cabinetPhone" placeholder="Téléphone" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input id="cabinetEmail" type="email" placeholder="Email" />
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button id="createCabinetBtn" class="btn" style="flex:1">Créer le cabinet</button>
+          <button id="manageCabinetsBtn" class="btn ghost" style="flex:1">Gérer les cabinets</button>
+        </div>
+      </div>
+
+      <!-- Cabinets List -->
+      <div id="cabinetsListCard" class="card hidden">
+        <h3>Mes Cabinets</h3>
+        <div class="list" id="cabinetsList" style="max-height:300px"></div>
+        <div style="margin-top:12px">
+          <button id="closeCabinetsListBtn" class="btn ghost">Fermer</button>
+        </div>
+      </div>
+
+      <!-- Dashboard Card -->
+      <div class="card" id="dashboard">
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px">
+          <div>
+            <h2 style="margin:0" id="dashboardTitle">Tableau de bord</h2>
+            <p class="small muted" style="margin:5px 0 0 0">Gérer les sociétés, modèles, cessions et rappels</p>
+          </div>
+          <div class="action-buttons">
+            <button id="newCompanyBtn" class="btn">NV société</button>
+            <button id="manageTemplatesBtn" class="btn ghost">Modèles</button>
+            <button id="manageCessionsBtn" class="btn ghost">Cessions</button>
+            <button id="exportBtn" class="btn ghost">Exporter</button>
+            <button id="importBtn" class="btn ghost">Importer</button>
+          </div>
+        </div>
+        
+        <div id="reminderNotice" class="notice hidden"></div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number" id="countCompanies">0</div>
+            <div class="stat-label">Sociétés</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="countReminders">0</div>
+            <div class="stat-label">Rappels</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="countTemplates">0</div>
+            <div class="stat-label">Modèles</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="countCessions">0</div>
+            <div class="stat-label">Cessions</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOUVELLE SECTION SOCIÉTÉS -->
+      <div id="societesSection" class="card hidden">
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:20px">
+          <div>
+            <h2 style="margin:0">Gestion des Sociétés</h2>
+            <p class="small muted" style="margin:5px 0 0 0">Liste complète des sociétés créées</p>
+          </div>
+          <div class="action-buttons">
+            <button id="newSocieteBtn" class="btn">NV société</button>
+            <button id="refreshSocietesBtn" class="btn ghost">Actualiser</button>
+            <button id="exportAllSocietesBtn" class="btn ghost">Exporter tout</button>
+          </div>
+        </div>
+
+        <!-- Statistiques rapides -->
+        <div class="societe-stats">
+          <div class="societe-stat-item">
+            <div class="societe-stat-value" id="totalSocietes">0</div>
+            <div class="societe-stat-label">Total sociétés</div>
+          </div>
+          <div class="societe-stat-item">
+            <div class="societe-stat-value" id="societesSARL">0</div>
+            <div class="societe-stat-label">SARL</div>
+          </div>
+          <div class="societe-stat-item">
+            <div class="societe-stat-value" id="societesSA">0</div>
+            <div class="societe-stat-label">SA</div>
+          </div>
+          <div class="societe-stat-item">
+            <div class="societe-stat-value" id="societesAvecCession">0</div>
+            <div class="societe-stat-label">Avec cession</div>
+          </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="quick-actions">
+          <div class="quick-action-card" onclick="showSocieteForm()">
+            <div class="quick-action-icon">➕</div>
+            <div class="quick-action-text">Nouvelle société</div>
+          </div>
+          <div class="quick-action-card" onclick="filterSocietes('SARL')">
+            <div class="quick-action-icon">🏢</div>
+            <div class="quick-action-text">Voir SARL</div>
+          </div>
+          <div class="quick-action-card" onclick="filterSocietes('SA')">
+            <div class="quick-action-icon">🏛️</div>
+            <div class="quick-action-text">Voir SA</div>
+          </div>
+          <div class="quick-action-card" onclick="filterSocietes('cession')">
+            <div class="quick-action-icon">🔁</div>
+            <div class="quick-action-text">Avec cession</div>
+          </div>
+        </div>
+
+        <!-- Recherche et filtres -->
+        <div class="card" style="margin-bottom:15px">
+          <h4 style="margin:0 0 12px 0">Recherche et filtres</h4>
+          <div class="search-row">
+            <input id="searchSocietes" placeholder="Rechercher par nom, RC, gérant..." />
+            <select id="filterSocieteType">
+              <option value="">Tous les types</option>
+              <option value="SARL">SARL</option>
+              <option value="SA">SA</option>
+              <option value="SNC">SNC</option>
+              <option value="EI">EI</option>
+            </select>
+            <select id="filterSocieteCession">
+              <option value="all">Toutes les cessions</option>
+              <option value="yes">Avec cession</option>
+              <option value="no">Sans cession</option>
+            </select>
+            <button id="searchSocietesBtn" class="btn ghost">Rechercher</button>
+            <button id="clearSocietesSearchBtn" class="btn">Réinitialiser</button>
+          </div>
+        </div>
+
+        <!-- Liste des sociétés -->
+        <div id="societesListContainer">
+          <h4 style="margin:0 0 12px 0">Liste des sociétés</h4>
+          <div id="societesList" class="list" style="max-height:600px;overflow-y:auto">
+            <!-- Les sociétés seront affichées ici dynamiquement -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Company Form -->
+      <div id="companyFormCard" class="card hidden">
+        <h3 id="companyFormTitle">Créer une société</h3>
+        <div class="form-grid cols-2">
+          <div>
+            <label>Nom commercial</label>
+            <input id="companyName" />
+          </div>
+          <div>
+            <label>Type juridique</label>
+            <select id="legalType"></select>
+          </div>
+          <div>
+            <label>Numéro RC</label>
+            <input id="companyRC" />
+          </div>
+          <div>
+            <label>ICE</label>
+            <input id="companyICE" />
+          </div>
+          <div>
+            <label>Date de création</label>
+            <input id="companyDate" type="date" />
+          </div>
+          
+          <!-- Section RC -->
+          <div class="full-width">
+            <label>Extrait RC (PDF ou Image)</label>
+            <div class="file-upload" onclick="document.getElementById('companyRCDoc').click()">
+              <div class="small">📁 Cliquer pour uploader l'extrait RC (PDF ou Image)</div>
+              <input type="file" id="companyRCDoc" accept=".pdf,.jpg,.jpeg,.png,.gif" class="hidden" />
+            </div>
+            <div id="companyRCDocPreview" class="file-preview-container"></div>
+          </div>
+          
+          <!-- Informations du Gérant -->
+          <div class="full-width" style="border-top: 2px solid var(--accent); padding-top: 15px; margin-top: 10px;">
+            <h4 style="margin: 0 0 15px 0; color: var(--accent);">Informations du Gérant</h4>
+            <div class="form-grid cols-2">
+              <div>
+                <label>Nom complet du gérant</label>
+                <input id="companyManager" />
+              </div>
+              <div>
+                <label>Nationalité du gérant</label>
+                <select id="managerNationality">
+                  <option value="marocain">Marocain</option>
+                  <option value="etranger">Étranger</option>
+                </select>
+              </div>
+              <div id="managerCINField">
+                <label>Numéro CIN</label>
+                <input id="managerCIN" placeholder="Ex: AB123456" />
+              </div>
+              <div id="managerPassportField" style="display: none;">
+                <label>Numéro de passeport</label>
+                <input id="managerPassport" placeholder="Numéro de passeport" />
+              </div>
+            </div>
+            
+            <!-- Upload documents gérant -->
+            <div class="form-grid cols-2" style="margin-top: 15px;">
+              <div>
+                <label>Photo CIN Recto (Marocain) / Passeport (Étranger - PDF ou Image)</label>
+                <div class="file-upload" onclick="document.getElementById('managerDocFront').click()">
+                  <div class="small">📁 Cliquer pour uploader</div>
+                  <input type="file" id="managerDocFront" accept=".pdf,.jpg,.jpeg,.png,.gif" class="hidden" />
+                </div>
+                <div id="managerDocFrontPreview" class="file-preview-container"></div>
+              </div>
+              <div>
+                <label>Photo CIN Verso (Marocain seulement)</label>
+                <div class="file-upload" onclick="document.getElementById('managerDocBack').click()">
+                  <div class="small">📁 Cliquer pour uploader</div>
+                  <input type="file" id="managerDocBack" accept=".jpg,.jpeg,.png,.gif" class="hidden" />
+                </div>
+                <div id="managerDocBackPreview" class="file-preview-container"></div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label>Capital social (DH)</label>
+            <input id="companyCapital" type="number" />
+          </div>
+          <div>
+            <label>Valeur part (DH)</label>
+            <input id="shareValue" type="number" value="100" />
+          </div>
+          <div>
+            <label>Téléphone</label>
+            <input id="companyPhone" />
+          </div>
+          <div class="full-width">
+            <label>Adresse</label>
+            <input id="companyAddress" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input id="companyEmail" type="email" />
+          </div>
+          <div>
+            <label>Modèle de statuts</label>
+            <select id="templateStatuts"></select>
+          </div>
+          <div>
+            <label>Modèle de PV</label>
+            <select id="templatePV"></select>
+          </div>
+          <div>
+            <label>Souhaite faire une cession ?</label>
+            <select id="wantsCession"><option value="no">Non</option><option value="yes">Oui</option></select>
+          </div>
+          <div>
+            <label>Date de rappel (si cession)</label>
+            <input id="cessionReminderDate" type="date" />
+          </div>
+          
+          <!-- Section des associés -->
+          <div class="full-width" id="associatesSection" style="display: none; border-top: 2px solid var(--accent); padding-top: 15px; margin-top: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h4 style="margin: 0; color: var(--accent);">Gestion des associés</h4>
+              <button type="button" id="addAssociateBtn" class="btn small">+ Ajouter un associé</button>
+            </div>
+            
+            <div id="associatesList" style="border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 12px; background: rgba(0,0,0,0.02); max-height: 600px; overflow-y: auto;">
+              <div class="small muted" style="text-align: center; padding: 20px;">
+                Aucun associé ajouté. Cliquez sur "Ajouter un associé" pour commencer.
+              </div>
+            </div>
+            
+            <div id="capitalSummary" style="margin-top: 10px; padding: 10px; background: var(--card); border-radius: 6px; display: none;">
+              <div class="small" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <span>Total des parts: <strong id="totalShares">0</strong></span>
+                <span>Capital couvert: <strong id="coveredCapital">0 DH</strong></span>
+                <span>Reste à couvrir: <strong id="remainingCapital">0 DH</strong></span>
+              </div>
+              <div id="capitalWarning" class="small" style="color: #dc2626; margin-top: 5px; display: none;">
+                ⚠️ Le capital n'est pas entièrement couvert par les parts des associés
+              </div>
+            </div>
+          </div>
+          
+          <div class="full-width">
+            <label>Notes / Observations</label>
+            <textarea id="companyNotes" rows="3"></textarea>
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button id="saveCompanyBtn" class="btn" style="flex:1">Enregistrer</button>
+          <button id="cancelCompanyBtn" class="btn ghost" style="flex:1">Annuler</button>
+        </div>
+      </div>
+
+      <!-- Templates Management -->
+      <div id="templatesCard" class="card hidden">
+        <h3>Modèles (Statuts & PV)</h3>
+        <p class="small muted">Gérer les modèles de documents</p>
+        <div class="grid cols-2">
+          <div>
+            <label>Titre modèle</label>
+            <input id="templateTitle" />
+            <label>Type</label>
+            <select id="templateType"><option value="statuts">Statuts</option><option value="pv">PV</option></select>
+            <label>Contenu</label>
+            <textarea id="templateContent" rows="12" placeholder="Utiliser {{NOM}}, {{GERANT}}, {{DATE}}, {{TYPE_JURIDIQUE}}, {{RC}}"></textarea>
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+              <button id="saveTemplateBtn" class="btn" style="flex:1">Enregistrer</button>
+              <button id="cancelTemplateBtn" class="btn ghost" style="flex:1">Annuler</button>
+            </div>
+          </div>
+          <div>
+            <label>Modèles disponibles</label>
+            <div class="list" style="border:1px solid rgba(0,0,0,0.06);padding:8px;border-radius:8px;min-height:200px" id="templatesList"></div>
+            <div style="margin-top:10px">
+              <button id="insertOnlineModelBtn" class="btn ghost">Modèle SARL long</button>
+              <button id="insertPVModelBtn" class="btn ghost" style="margin-top:5px">Modèle PV standard</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cessions Management -->
+      <div id="cessionsCard" class="card hidden">
+        <h3>Gestion des Cessions de Parts</h3>
+        <p class="small muted">Gérer les cessions de parts sociales</p>
+        
+        <div style="margin-bottom:15px;display:flex;gap:8px;flex-wrap:wrap">
+          <button id="newCessionBtn" class="btn">Nouvelle cession</button>
+          <button id="cancelCessionBtn" class="btn ghost">Retour</button>
+        </div>
+
+        <!-- Cession Form -->
+        <div id="cessionForm" class="hidden">
+          <h4 id="cessionFormTitle">Nouvelle cession de parts</h4>
+          <div class="form-grid cols-2">
+            <div>
+              <label>Société concernée</label>
+              <select id="cessionCompany"></select>
+            </div>
+            <div>
+              <label>Date de la cession</label>
+              <input id="cessionDate" type="date" />
+            </div>
+            <div>
+              <label>Cédant (vendeur)</label>
+              <input id="cessionCedant" placeholder="Nom complet du cédant" />
+            </div>
+            <div>
+              <label>Adresse du cédant</label>
+              <input id="cessionCedantAddress" placeholder="Adresse complète" />
+            </div>
+            <div>
+              <label>Cessionnaire (acquéreur)</label>
+              <input id="cessionCessionnaire" placeholder="Nom complet du cessionnaire" />
+            </div>
+            <div>
+              <label>Adresse du cessionnaire</label>
+              <input id="cessionCessionnaireAddress" placeholder="Adresse complète" />
+            </div>
+            <div>
+              <label>Nombre de parts cédées</label>
+              <input id="cessionPartsCount" type="number" placeholder="Ex: 100" />
+            </div>
+            <div>
+              <label>Prix de cession (DH)</label>
+              <input id="cessionPrice" type="number" placeholder="Montant en dirhams" />
+            </div>
+            <div class="full-width">
+              <label>Mode de paiement</label>
+              <select id="cessionPaymentMode">
+                <option value="comptant">Comptant</option>
+                <option value="echeances">Échéances</option>
+                <option value="autre">Autre</option>
+              </select>
+            </div>
+            <div class="full-width">
+              <label>Conditions particulières</label>
+              <textarea id="cessionConditions" rows="3" placeholder="Conditions spécifiques de la cession..."></textarea>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button id="saveCessionBtn" class="btn" style="flex:1">Enregistrer la cession</button>
+            <button id="generateCessionDocBtn" class="btn ghost" style="flex:1">Générer document</button>
+          </div>
+        </div>
+
+        <!-- Cessions List -->
+        <div id="cessionsListContainer">
+          <h4>Cessions enregistrées</h4>
+          <div class="list" style="max-height:400px;overflow:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Société</th>
+                  <th>Cédant</th>
+                  <th>Cessionnaire</th>
+                  <th>Parts</th>
+                  <th>Prix</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="cessionsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="card">
+        <h3>Recherche</h3>
+        <div class="search-row">
+          <input id="searchText" placeholder="Nom, gérant, RC..." />
+          <select id="filterType"><option value="">Tous types</option></select>
+          <select id="filterCession"><option value="all">Tous</option><option value="yes">Avec cession</option><option value="no">Sans cession</option></select>
+          <button id="searchBtn" class="btn ghost">Rechercher</button>
+          <button id="clearSearchBtn" class="btn">Réinitialiser</button>
+        </div>
+      </div>
+
+      <!-- Companies List -->
+      <div class="card">
+        <h3>Liste des sociétés</h3>
+        <div class="table-container">
+          <!-- Desktop Table -->
+          <div class="desktop-table">
+            <div class="list">
+              <table>
+                <thead><tr><th>Nom</th><th>Type</th><th>Gérant</th><th>RC</th><th>Cession</th><th>Actions</th></tr></thead>
+                <tbody id="companiesTable"></tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Mobile Cards -->
+          <div class="mobile-table" id="companiesMobileList"></div>
+        </div>
+      </div>
+
+      <!-- Reminders -->
+      <div class="card">
+        <h3>Rappels</h3>
+        <div id="remindersList"></div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:20px;text-align:center;color:var(--muted);font-size:12px;padding:0 10px">
+      Application locale - Données stockées dans le navigateur
+    </div>
+  </div>
+
+  <div id="printable" class="hidden"></div>
+  <input id="fileInput" type="file" accept="application/json" class="hidden" />
+
+  <script>
+    // Data helpers
+    const LS_KEYS = {
+      ADMIN: 'cabinet_admin', 
+      COMP: 'cabinet_companies', 
+      TPL: 'cabinet_templates', 
+      REM: 'cabinet_reminders', 
+      THEME: 'cabinet_theme',
+      CESSIONS: 'cabinet_cessions',
+      CABINETS: 'cabinet_cabinets',
+      CURRENT_CABINET: 'cabinet_current'
+    };
+
+    function load(key, defaultVal) {
+      try {
+        return JSON.parse(localStorage.getItem(key)) || defaultVal;
+      } catch(e) {
+        return defaultVal;
+      }
+    }
+
+    function save(key, val) {
+      localStorage.setItem(key, JSON.stringify(val));
+    }
+
+    // Default data
+    const defaultLegalTypes = [
+      {code:'SARL','label':'SARL - Société à responsabilité limitée', hasAssociates: true},
+      {code:'SARL_U','label':'SARL Unipersonnelle (EURL)', hasAssociates: false},
+      {code:'SA','label':'SA - Société Anonyme', hasAssociates: true},
+      {code:'SNC','label':'SNC - Société en Nom Collectif', hasAssociates: true},
+      {code:'SCS','label':'SCS - Société en Commandite Simple', hasAssociates: true},
+      {code:'EI','label':'Entreprise Individuelle', hasAssociates: false},
+      {code:'COOP','label':'Coopérative', hasAssociates: true}
+    ];
+
+    const defaultTemplates = [
+      {
+        id: 'tpl1',
+        title: 'Statuts courts - SARL',
+        type: 'statuts',
+        content: `STATUTS DE LA SOCIÉTÉ
+
+Dénomination : {{NOM}}
+Forme : {{TYPE_JURIDIQUE}}
+RC : {{RC}}
+Siège social : ___________________
+Objet social : ___________________
+Capital social : _________ DH
+Durée : 99 ans
+
+ARTICLE 1 - DÉNOMINATION
+La société est dénommée : {{NOM}}
+
+ARTICLE 2 - FORME JURIDIQUE
+La société est une {{TYPE_JURIDIQUE}}
+
+ARTICLE 3 - SIÈGE SOCIAL
+Le siège social est fixé à : ___________________
+
+ARTICLE 4 - OBJET SOCIAL
+L'objet social est : ___________________
+
+ARTICLE 5 - DURÉE
+La durée de la société est de 99 ans
+
+ARTICLE 6 - CAPITAL SOCIAL
+Le capital social est de _________ DH, divisé en _______ parts sociales
+
+ARTICLE 7 - GÉRANCE
+La gérance est assurée par : {{GERANT}}
+
+Fait à ________, le {{DATE}}`
+      },
+      {
+        id: 'tpl2',
+        title: 'PV Assemblée - Nomination',
+        type: 'pv',
+        content: `PROCÈS-VERBAL DE L'ASSEMBLÉE GÉNÉRALE
+
+La société : {{NOM}}
+Forme : {{TYPE_JURIDIQUE}}
+RC : {{RC}}
+
+Les associés de la société {{NOM}} se sont réunis le {{DATE}}.
+
+DÉCISIONS PRISES :
+
+1. Nomination du gérant :
+Il a été décidé à l'unanimité de nommer Monsieur/Madame {{GERANT}} en qualité de gérant de la société.
+
+2. Pouvoirs :
+Le gérant dispose des pouvoirs les plus étendus pour agir au nom de la société.
+
+La séance est levée à ________ heures.
+
+Fait à ________, le {{DATE}}`
+      },
+      {
+        id: 'tpl3',
+        title: 'PV Assemblée constitutive',
+        type: 'pv',
+        content: `PROCÈS-VERBAL DE L'ASSEMBLÉE GÉNÉRALE CONSTITUTIVE
+
+La société : {{NOM}}
+Forme : {{TYPE_JURIDIQUE}}
+RC : {{RC}}
+
+Les fondateurs de la société {{NOM}} se sont réunis le {{DATE}} pour constituer la société.
+
+DÉCISIONS PRISES :
+
+1. Approbation des statuts :
+Les statuts de la société ont été approuvés à l'unanimité.
+
+2. Nomination des organes de gestion :
+Il a été décidé de nommer :
+- Monsieur/Madame {{GERANT}} en qualité de gérant
+- [Nom des associés] en qualité d'associés
+
+3. Capital social :
+Le capital social est fixé à [Montant] DH, divisé en [Nombre] parts sociales.
+
+4. Siège social :
+Le siège social est fixé à [Adresse].
+
+La séance est levée à ________ heures.
+
+Fait à ________, le {{DATE}}
+
+LES FONDATEURS :
+1. ___________________
+2. ___________________`
+      }
+    ];
+
+    // Utilities
+    function genId() {
+      return 'id_' + Math.random().toString(36).slice(2, 9);
+    }
+
+    function todayISO() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    // App State
+    let admin = load(LS_KEYS.ADMIN, {user: 'admin', pass: 'admin123'});
+    let companies = load(LS_KEYS.COMP, []);
+    let templates = load(LS_KEYS.TPL, defaultTemplates);
+    let reminders = load(LS_KEYS.REM, []);
+    let cessions = load(LS_KEYS.CESSIONS, []);
+    let cabinets = load(LS_KEYS.CABINETS, []);
+    let currentCabinetId = localStorage.getItem(LS_KEYS.CURRENT_CABINET) || '';
+    let theme = localStorage.getItem(LS_KEYS.THEME) || 'dark';
+
+    // DOM Elements
+    const loginSection = document.getElementById('loginSection');
+    const appDiv = document.getElementById('app');
+    const loginBtn = document.getElementById('loginBtn');
+    const initBtn = document.getElementById('initBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userBadge = document.getElementById('userBadge');
+    const countCompanies = document.getElementById('countCompanies');
+    const countReminders = document.getElementById('countReminders');
+    const countTemplates = document.getElementById('countTemplates');
+    const countCessions = document.getElementById('countCessions');
+    const mainTitle = document.getElementById('mainTitle');
+    const dashboardTitle = document.getElementById('dashboardTitle');
+
+    // Cabinet elements
+    const cabinetSelect = document.getElementById('cabinetSelect');
+    const currentCabinetBadge = document.getElementById('currentCabinetBadge');
+    const cabinetName = document.getElementById('cabinetName');
+    const cabinetAddress = document.getElementById('cabinetAddress');
+    const cabinetPhone = document.getElementById('cabinetPhone');
+    const cabinetEmail = document.getElementById('cabinetEmail');
+    const createCabinetBtn = document.getElementById('createCabinetBtn');
+    const manageCabinetsBtn = document.getElementById('manageCabinetsBtn');
+    const cabinetsListCard = document.getElementById('cabinetsListCard');
+    const cabinetsList = document.getElementById('cabinetsList');
+    const closeCabinetsListBtn = document.getElementById('closeCabinetsListBtn');
+
+    const companyFormCard = document.getElementById('companyFormCard');
+    const newCompanyBtn = document.getElementById('newCompanyBtn');
+    const saveCompanyBtn = document.getElementById('saveCompanyBtn');
+    const cancelCompanyBtn = document.getElementById('cancelCompanyBtn');
+
+    const templateStatuts = document.getElementById('templateStatuts');
+    const templatePV = document.getElementById('templatePV');
+
+    const manageTemplatesBtn = document.getElementById('manageTemplatesBtn');
+    const templatesCard = document.getElementById('templatesCard');
+    const templatesList = document.getElementById('templatesList');
+    const templateTitle = document.getElementById('templateTitle');
+    const templateType = document.getElementById('templateType');
+    const templateContent = document.getElementById('templateContent');
+    const saveTemplateBtn = document.getElementById('saveTemplateBtn');
+    const cancelTemplateBtn = document.getElementById('cancelTemplateBtn');
+    const insertOnlineModelBtn = document.getElementById('insertOnlineModelBtn');
+    const insertPVModelBtn = document.getElementById('insertPVModelBtn');
+
+    // Cessions elements
+    const manageCessionsBtn = document.getElementById('manageCessionsBtn');
+    const cessionsCard = document.getElementById('cessionsCard');
+    const newCessionBtn = document.getElementById('newCessionBtn');
+    const cancelCessionBtn = document.getElementById('cancelCessionBtn');
+    const cessionForm = document.getElementById('cessionForm');
+    const cessionFormTitle = document.getElementById('cessionFormTitle');
+    const cessionCompany = document.getElementById('cessionCompany');
+    const cessionDate = document.getElementById('cessionDate');
+    const cessionCedant = document.getElementById('cessionCedant');
+    const cessionCedantAddress = document.getElementById('cessionCedantAddress');
+    const cessionCessionnaire = document.getElementById('cessionCessionnaire');
+    const cessionCessionnaireAddress = document.getElementById('cessionCessionnaireAddress');
+    const cessionPartsCount = document.getElementById('cessionPartsCount');
+    const cessionPrice = document.getElementById('cessionPrice');
+    const cessionPaymentMode = document.getElementById('cessionPaymentMode');
+    const cessionConditions = document.getElementById('cessionConditions');
+    const saveCessionBtn = document.getElementById('saveCessionBtn');
+    const generateCessionDocBtn = document.getElementById('generateCessionDocBtn');
+    const cessionsTable = document.getElementById('cessionsTable');
+
+    const companiesTable = document.getElementById('companiesTable');
+    const companiesMobileList = document.getElementById('companiesMobileList');
+
+    const searchText = document.getElementById('searchText');
+    const filterType = document.getElementById('filterType');
+    const filterCession = document.getElementById('filterCession');
+    const searchBtn = document.getElementById('searchBtn');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+    const remindersList = document.getElementById('remindersList');
+    const reminderNotice = document.getElementById('reminderNotice');
+
+    const themeSelect = document.getElementById('themeSelect');
+    const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
+    const fileInput = document.getElementById('fileInput');
+
+    // Company form fields
+    const companyFormTitle = document.getElementById('companyFormTitle');
+    const companyName = document.getElementById('companyName');
+    const legalType = document.getElementById('legalType');
+    const companyRC = document.getElementById('companyRC');
+    const companyICE = document.getElementById('companyICE');
+    const companyDate = document.getElementById('companyDate');
+    const companyManager = document.getElementById('companyManager');
+    const companyCapital = document.getElementById('companyCapital');
+    const companyPhone = document.getElementById('companyPhone');
+    const companyAddress = document.getElementById('companyAddress');
+    const companyEmail = document.getElementById('companyEmail');
+    const wantsCession = document.getElementById('wantsCession');
+    const cessionReminderDate = document.getElementById('cessionReminderDate');
+    const companyNotes = document.getElementById('companyNotes');
+
+    // Gérant fields
+    const managerNationality = document.getElementById('managerNationality');
+    const managerCIN = document.getElementById('managerCIN');
+    const managerPassport = document.getElementById('managerPassport');
+    const managerCINField = document.getElementById('managerCINField');
+    const managerPassportField = document.getElementById('managerPassportField');
+    const managerDocFront = document.getElementById('managerDocFront');
+    const managerDocBack = document.getElementById('managerDocBack');
+    const managerDocFrontPreview = document.getElementById('managerDocFrontPreview');
+    const managerDocBackPreview = document.getElementById('managerDocBackPreview');
+
+    // RC Document
+    const companyRCDoc = document.getElementById('companyRCDoc');
+    const companyRCDocPreview = document.getElementById('companyRCDocPreview');
+
+    // Nouveaux éléments pour la section sociétés
+    const societesSection = document.getElementById('societesSection');
+    const newSocieteBtn = document.getElementById('newSocieteBtn');
+    const refreshSocietesBtn = document.getElementById('refreshSocietesBtn');
+    const exportAllSocietesBtn = document.getElementById('exportAllSocietesBtn');
+    const totalSocietes = document.getElementById('totalSocietes');
+    const societesSARL = document.getElementById('societesSARL');
+    const societesSA = document.getElementById('societesSA');
+    const societesAvecCession = document.getElementById('societesAvecCession');
+    const searchSocietes = document.getElementById('searchSocietes');
+    const filterSocieteType = document.getElementById('filterSocieteType');
+    const filterSocieteCession = document.getElementById('filterSocieteCession');
+    const searchSocietesBtn = document.getElementById('searchSocietesBtn');
+    const clearSocietesSearchBtn = document.getElementById('clearSocietesSearchBtn');
+    const societesList = document.getElementById('societesList');
+
+    let editingCompanyId = null;
+    let currentTemplateId = null;
+    let editingCessionId = null;
+    let associateCounter = 0;
+
+    // Initialize UI
+    function initUI() {
+      setTheme(theme);
+      themeSelect.value = theme;
+
+      // Fill legal types
+      legalType.innerHTML = '';
+      filterType.innerHTML = '<option value="">Tous types juridiques</option>';
+      defaultLegalTypes.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t.code;
+        option.textContent = t.label;
+        legalType.appendChild(option);
+
+        const option2 = document.createElement('option');
+        option2.value = t.code;
+        option2.textContent = t.label;
+        filterType.appendChild(option2);
+      });
+
+      // Gérant nationality toggle
+      managerNationality.addEventListener('change', toggleManagerNationality);
+      
+      // File upload handlers for manager
+      managerDocFront.addEventListener('change', function(e) {
+        handleFileUpload(e, managerDocFrontPreview, 'managerDocFront');
+      });
+      managerDocBack.addEventListener('change', function(e) {
+        handleFileUpload(e, managerDocBackPreview, 'managerDocBack');
+      });
+
+      // RC document handler
+      companyRCDoc.addEventListener('change', function(e) {
+        handleFileUpload(e, companyRCDocPreview, 'companyRCDoc');
+      });
+
+      // CORRECTION 1: Ajouter l'écouteur pour remplir automatiquement le cédant
+      cessionCompany.addEventListener('change', function() {
+        const companyId = this.value;
+        const company = companies.find(c => c.id === companyId);
+        
+        if (company) {
+          // Remplir automatiquement le cédant avec le nom du gérant
+          cessionCedant.value = company.manager || '';
+        }
+      });
+
+      // Ajouter l'écouteur pour le type juridique
+      legalType.addEventListener('change', toggleAssociatesSection);
+      
+      // Ajouter l'écouteur pour le bouton d'ajout d'associé
+      document.getElementById('addAssociateBtn').addEventListener('click', addAssociate);
+      
+      // Écouteurs pour le calcul automatique
+      document.getElementById('companyCapital').addEventListener('input', updateCapitalCalculations);
+      document.getElementById('shareValue').addEventListener('input', updateCapitalCalculations);
+
+      // PV Model button
+      insertPVModelBtn.addEventListener('click', insertPVModel);
+
+      // Nouveaux écouteurs pour la section sociétés
+      newSocieteBtn.addEventListener('click', showSocieteForm);
+      refreshSocietesBtn.addEventListener('click', refreshSocietesList);
+      exportAllSocietesBtn.addEventListener('click', exportAllSocietes);
+      searchSocietesBtn.addEventListener('click', searchSocietesList);
+      clearSocietesSearchBtn.addEventListener('click', clearSocietesSearch);
+
+      renderCabinetSelector();
+      updateCabinetDisplay();
+      renderTemplateOptions();
+      refreshCounts();
+      renderCompaniesTable(getCurrentCabinetCompanies());
+      renderReminders();
+      checkDueReminders();
+      renderCessionsTable();
+      refreshSocietesList(); // Charger la liste des sociétés
+    }
+
+    // NOUVELLES FONCTIONS POUR LA SECTION SOCIÉTÉS
+
+    function refreshSocietesList() {
+      const currentCompanies = getCurrentCabinetCompanies();
+      renderSocietesList(currentCompanies);
+      updateSocietesStats(currentCompanies);
+    }
+
+    function renderSocietesList(companiesList) {
+      societesList.innerHTML = '';
+
+      if (companiesList.length === 0) {
+        societesList.innerHTML = `
+          <div style="text-align:center;padding:40px;color:var(--muted)">
+            <div style="font-size:48px;margin-bottom:10px">🏢</div>
+            <h4>Aucune société trouvée</h4>
+            <p>Créez votre première société pour commencer</p>
+            <button class="btn" onclick="showSocieteForm()" style="margin-top:15px">Créer une société</button>
+          </div>
+        `;
+        return;
+      }
+
+      companiesList.forEach(company => {
+        const societeCard = document.createElement('div');
+        societeCard.className = 'societe-card';
+        
+        societeCard.innerHTML = `
+          <div class="societe-header">
+            <h3 class="societe-title">${company.name}</h3>
+            <div class="societe-badge">${getLegalTypeLabel(company.type)}</div>
+          </div>
+          
+          <div class="societe-details">
+            <div class="societe-detail-item">
+              <span class="societe-detail-label">RC:</span> ${company.rc || 'Non renseigné'}
+            </div>
+            <div class="societe-detail-item">
+              <span class="societe-detail-label">Gérant:</span> ${company.manager || 'Non renseigné'}
+            </div>
+            <div class="societe-detail-item">
+              <span class="societe-detail-label">Capital:</span> ${company.capital ? company.capital + ' DH' : 'Non renseigné'}
+            </div>
+            <div class="societe-detail-item">
+              <span class="societe-detail-label">Date création:</span> ${company.date || 'Non renseignée'}
+            </div>
+          </div>
+          
+          <div class="societe-actions">
+            <button class="societe-action-btn primary" onclick="editSociete('${company.id}')">✏️ Éditer</button>
+            <button class="societe-action-btn secondary" onclick="showSocieteDetails('${company.id}')">👁️ Détails</button>
+            <button class="societe-action-btn secondary" onclick="downloadStatuts('${company.id}')">📄 Statuts</button>
+            <button class="societe-action-btn secondary" onclick="downloadPV('${company.id}')">📋 PV</button>
+            <button class="societe-action-btn secondary" onclick="downloadRCSummary('${company.id}')">🏛️ RC</button>
+            <button class="societe-action-btn danger" onclick="deleteSociete('${company.id}')">🗑️ Supprimer</button>
+          </div>
+        `;
+        
+        societesList.appendChild(societeCard);
+      });
+    }
+
+    function updateSocietesStats(companiesList) {
+      totalSocietes.textContent = companiesList.length;
+      societesSARL.textContent = companiesList.filter(c => c.type === 'SARL' || c.type === 'SARL_U').length;
+      societesSA.textContent = companiesList.filter(c => c.type === 'SA').length;
+      societesAvecCession.textContent = companiesList.filter(c => c.wantsCession).length;
+    }
+
+    function showSocieteForm() {
+      companyFormCard.classList.remove('hidden');
+      societesSection.classList.add('hidden');
+      companyFormTitle.textContent = 'Créer une société';
+      editingCompanyId = null;
+      
+      // Reset form
+      companyName.value = '';
+      legalType.value = '';
+      companyRC.value = '';
+      companyICE.value = '';
+      companyDate.value = todayISO();
+      companyManager.value = '';
+      companyCapital.value = '';
+      document.getElementById('shareValue').value = '100';
+      companyPhone.value = '';
+      companyAddress.value = '';
+      companyEmail.value = '';
+      wantsCession.value = 'no';
+      cessionReminderDate.value = '';
+      companyNotes.value = '';
+      
+      // Reset manager fields
+      managerNationality.value = 'marocain';
+      managerCIN.value = '';
+      managerPassport.value = '';
+      managerDocFrontPreview.innerHTML = '';
+      managerDocBackPreview.innerHTML = '';
+      toggleManagerNationality();
+      
+      // Reset RC document
+      companyRCDocPreview.innerHTML = '';
+      
+      // Réinitialiser les associés
+      document.getElementById('associatesList').innerHTML = 
+        '<div class="small muted" style="text-align: center; padding: 20px;">Aucun associé ajouté. Cliquez sur "Ajouter un associé" pour commencer.</div>';
+      associateCounter = 0;
+      document.getElementById('associatesSection').style.display = 'none';
+      document.getElementById('capitalSummary').style.display = 'none';
+    }
+
+    function editSociete(id) {
+      const company = companies.find(c => c.id === id);
+      if (!company) return;
+      
+      companyFormCard.classList.remove('hidden');
+      societesSection.classList.add('hidden');
+      companyFormTitle.textContent = 'Modifier la société';
+      editingCompanyId = id;
+      
+      // Fill form
+      companyName.value = company.name;
+      legalType.value = company.type;
+      companyRC.value = company.rc;
+      companyICE.value = company.ice;
+      companyDate.value = company.date;
+      companyManager.value = company.manager;
+      companyCapital.value = company.capital;
+      document.getElementById('shareValue').value = company.shareValue || '100';
+      companyPhone.value = company.phone;
+      companyAddress.value = company.address;
+      companyEmail.value = company.email;
+      wantsCession.value = company.wantsCession ? 'yes' : 'no';
+      cessionReminderDate.value = company.cessionReminderDate || '';
+      companyNotes.value = company.notes || '';
+      
+      // CORRECTION 1: Remplir les modèles sélectionnés
+      if (company.templateStatuts) {
+        templateStatuts.value = company.templateStatuts;
+      }
+      if (company.templatePV) {
+        templatePV.value = company.templatePV;
+      }
+      
+      // Fill manager fields
+      managerNationality.value = company.managerNationality || 'marocain';
+      managerCIN.value = company.managerCIN || '';
+      managerPassport.value = company.managerPassport || '';
+      toggleManagerNationality();
+      
+      // Gérer la section des associés
+      toggleAssociatesSection();
+      
+      // Charger les associés existants
+      if (company.associates && company.associates.length > 0) {
+        const associatesList = document.getElementById('associatesList');
+        associatesList.innerHTML = '';
+        
+        company.associates.forEach(associate => {
+          addAssociate();
+          const lastAssociate = associatesList.lastElementChild;
+          lastAssociate.querySelector('.associate-name').value = associate.name;
+          lastAssociate.querySelector('.associate-nationality').value = associate.nationality || 'marocain';
+          lastAssociate.querySelector('.associate-cin').value = associate.cin || '';
+          lastAssociate.querySelector('.associate-passport').value = associate.passport || '';
+          lastAssociate.querySelector('.associate-percentage').value = associate.percentage;
+          
+          // Déclencher le calcul et la mise à jour des champs
+          const percentageInput = lastAssociate.querySelector('.associate-percentage');
+          percentageInput.dispatchEvent(new Event('input'));
+          
+          const nationalitySelect = lastAssociate.querySelector('.associate-nationality');
+          nationalitySelect.dispatchEvent(new Event('change'));
+        });
+      }
+      
+      updateCapitalCalculations();
+    }
+
+    function showSocieteDetails(id) {
+      const company = companies.find(c => c.id === id);
+      if (!company) return;
+      
+      const modal = createModal('Détails de la société - ' + company.name);
+      
+      let associatesHTML = '';
+      if (company.associates && company.associates.length > 0) {
+        associatesHTML = `
+          <h4>Associés</h4>
+          <div style="max-height:200px;overflow-y:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:12px">
+              <thead>
+                <tr style="background:var(--accent);color:white">
+                  <th style="padding:8px;text-align:left">Nom</th>
+                  <th style="padding:8px;text-align:center">Nationalité</th>
+                  <th style="padding:8px;text-align:center">Parts</th>
+                  <th style="padding:8px;text-align:center">Pourcentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${company.associates.map(assoc => `
+                  <tr>
+                    <td style="padding:8px;border-bottom:1px solid rgba(0,0,0,0.1)">${assoc.name}</td>
+                    <td style="padding:8px;border-bottom:1px solid rgba(0,0,0,0.1);text-align:center">${assoc.nationality === 'marocain' ? 'Marocain' : 'Étranger'}</td>
+                    <td style="padding:8px;border-bottom:1px solid rgba(0,0,0,0.1);text-align:center">${assoc.shares}</td>
+                    <td style="padding:8px;border-bottom:1px solid rgba(0,0,0,0.1);text-align:center">${assoc.percentage}%</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+      
+      modal.innerHTML += `
+        <div class="societe-details" style="margin-bottom:20px">
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">Type juridique:</span> ${getLegalTypeLabel(company.type)}
+          </div>
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">RC:</span> ${company.rc || 'Non renseigné'}
+          </div>
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">ICE:</span> ${company.ice || 'Non renseigné'}
+          </div>
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">Date création:</span> ${company.date || 'Non renseignée'}
+          </div>
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">Gérant:</span> ${company.manager || 'Non renseigné'}
+          </div>
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">Nationalité gérant:</span> ${company.managerNationality === 'marocain' ? 'Marocain' : 'Étranger'}
+          </div>
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">${company.managerNationality === 'marocain' ? 'CIN:' : 'Passeport:'}</span> ${company.managerNationality === 'marocain' ? company.managerCIN : company.managerPassport}
+          </div>
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">Capital social:</span> ${company.capital ? company.capital + ' DH' : 'Non renseigné'}
+          </div>
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">Valeur part:</span> ${company.shareValue || '100'} DH
+          </div>
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">Téléphone:</span> ${company.phone || 'Non renseigné'}
+          </div>
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">Email:</span> ${company.email || 'Non renseigné'}
+          </div>
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">Adresse:</span> ${company.address || 'Non renseignée'}
+          </div>
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">Cession souhaitée:</span> ${company.wantsCession ? 'Oui' : 'Non'}
+          </div>
+          ${company.wantsCession ? `
+          <div class="societe-detail-item">
+            <span class="societe-detail-label">Date rappel cession:</span> ${company.cessionReminderDate || 'Non renseignée'}
+          </div>
+          ` : ''}
+        </div>
+        
+        ${associatesHTML}
+        
+        ${company.notes ? `
+        <div style="margin-top:15px">
+          <h4>Notes</h4>
+          <div style="background:rgba(0,0,0,0.02);padding:10px;border-radius:6px">${company.notes}</div>
+        </div>
+        ` : ''}
+        
+        <div class="societe-actions" style="margin-top:20px">
+          <button class="societe-action-btn primary" onclick="editSociete('${company.id}'); closeModal()">✏️ Éditer</button>
+          <button class="societe-action-btn secondary" onclick="downloadStatuts('${company.id}')">📄 Statuts</button>
+          <button class="societe-action-btn secondary" onclick="downloadPV('${company.id}')">📋 PV</button>
+          <button class="societe-action-btn secondary" onclick="downloadRCSummary('${company.id}')">🏛️ RC</button>
+        </div>
+      `;
+    }
+
+    function deleteSociete(id) {
+      const company = companies.find(c => c.id === id);
+      if (!company) return;
+      
+      if (confirm(`Êtes-vous sûr de vouloir supprimer la société "${company.name}" ? Cette action est irréversible.`)) {
+        companies = companies.filter(c => c.id !== id);
+        save(LS_KEYS.COMP, companies);
+        refreshSocietesList();
+        refreshCounts();
+        updateReminders();
+        renderReminders();
+      }
+    }
+
+    function downloadStatuts(id) {
+      const company = companies.find(c => c.id === id);
+      if (!company) return;
+      
+      // CORRECTION 1: Utiliser le modèle attaché à la société
+      const template = templates.find(t => t.id === company.templateStatuts);
+      let content = template ? template.content : 'STATUTS DE LA SOCIÉTÉ\n\nDénomination: ' + company.name + '\nForme: ' + getLegalTypeLabel(company.type) + '\nRC: ' + company.rc;
+      
+      // CORRECTION 1: Remplacer les variables du template avec les données réelles de la société
+      content = content.replace(/{{NOM}}/g, company.name)
+                      .replace(/{{TYPE_JURIDIQUE}}/g, getLegalTypeLabel(company.type))
+                      .replace(/{{RC}}/g, company.rc || 'Non renseigné')
+                      .replace(/{{GERANT}}/g, company.manager || 'Non renseigné')
+                      .replace(/{{DATE}}/g, company.date || 'Non renseignée')
+                      .replace(/{{CAPITAL}}/g, company.capital || 'Non renseigné')
+                      .replace(/{{ADRESSE}}/g, company.address || 'Non renseignée')
+                      .replace(/{{TELEPHONE}}/g, company.phone || 'Non renseigné')
+                      .replace(/{{EMAIL}}/g, company.email || 'Non renseigné');
+      
+      const printable = document.getElementById('printable');
+      printable.innerHTML = `
+        <div style="font-family:Arial,sans-serif;padding:20px;max-width:800px;margin:0 auto">
+          <h1 style="text-align:center">STATUTS - ${company.name}</h1>
+          <div style="text-align:center;margin-bottom:30px">
+            <p><strong>${getLegalTypeLabel(company.type)} - RC: ${company.rc || 'Non renseigné'}</strong></p>
+            <p>Gérant: ${company.manager || 'Non renseigné'}</p>
+            <p>Date de création: ${company.date || 'Non renseignée'}</p>
+            <p>Capital social: ${company.capital || 'Non renseigné'} DH</p>
+          </div>
+          <pre style="white-space:pre-wrap;font-family:inherit;line-height:1.5">${content}</pre>
+          <div style="margin-top:40px;font-size:12px;color:#666">
+            <p>Document généré le ${new Date().toLocaleDateString()} - Cabinet Comptable</p>
+          </div>
+        </div>
+      `;
+      
+      generatePDF(printable, `statuts-${company.name.replace(/\s+/g, '-')}.pdf`);
+    }
+
+    function downloadPV(id) {
+      const company = companies.find(c => c.id === id);
+      if (!company) return;
+      
+      // CORRECTION 1: Utiliser le modèle attaché à la société
+      const template = templates.find(t => t.id === company.templatePV);
+      let content = template ? template.content : 'PROCÈS-VERBAL\n\nSociété: ' + company.name + '\nDate: ' + new Date().toLocaleDateString();
+      
+      // CORRECTION 1: Remplacer les variables du template avec les données réelles de la société
+      content = content.replace(/{{NOM}}/g, company.name)
+                      .replace(/{{TYPE_JURIDIQUE}}/g, getLegalTypeLabel(company.type))
+                      .replace(/{{RC}}/g, company.rc || 'Non renseigné')
+                      .replace(/{{GERANT}}/g, company.manager || 'Non renseigné')
+                      .replace(/{{DATE}}/g, company.date || 'Non renseignée')
+                      .replace(/{{CAPITAL}}/g, company.capital || 'Non renseigné')
+                      .replace(/{{ADRESSE}}/g, company.address || 'Non renseignée');
+      
+      const printable = document.getElementById('printable');
+      printable.innerHTML = `
+        <div style="font-family:Arial,sans-serif;padding:20px;max-width:800px;margin:0 auto">
+          <h1 style="text-align:center">PROCÈS-VERBAL - ${company.name}</h1>
+          <div style="text-align:center;margin-bottom:30px">
+            <p><strong>${getLegalTypeLabel(company.type)} - RC: ${company.rc || 'Non renseigné'}</strong></p>
+            <p>Gérant: ${company.manager || 'Non renseigné'}</p>
+            <p>Date: ${new Date().toLocaleDateString()}</p>
+          </div>
+          <pre style="white-space:pre-wrap;font-family:inherit;line-height:1.5">${content}</pre>
+          <div style="margin-top:40px;font-size:12px;color:#666">
+            <p>Document généré le ${new Date().toLocaleDateString()} - Cabinet Comptable</p>
+          </div>
+        </div>
+      `;
+      
+      generatePDF(printable, `pv-${company.name.replace(/\s+/g, '-')}.pdf`);
+    }
+
+    function downloadRCSummary(id) {
+      const company = companies.find(c => c.id === id);
+      if (!company) return;
+      
+      const printable = document.getElementById('printable');
+      printable.innerHTML = `
+        <div style="font-family:Arial,sans-serif;padding:20px;max-width:800px;margin:0 auto">
+          <h1 style="text-align:center;margin-bottom:30px">RÉSUMÉ D'IDENTITÉ - ${company.name}</h1>
+          
+          <div style="margin-bottom:20px;border:2px solid #333;padding:20px;border-radius:10px">
+            <h2 style="color:#0ea5a4;border-bottom:2px solid #0ea5a4;padding-bottom:10px">INFORMATIONS GÉNÉRALES</h2>
+            <table style="width:100%;border-collapse:collapse;margin-top:15px">
+              <tr>
+                <td style="padding:10px;border:1px solid #ccc;width:30%"><strong>Dénomination :</strong></td>
+                <td style="padding:10px;border:1px solid #ccc">${company.name}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px;border:1px solid #ccc"><strong>Forme juridique :</strong></td>
+                <td style="padding:10px;border:1px solid #ccc">${getLegalTypeLabel(company.type)}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px;border:1px solid #ccc"><strong>RC :</strong></td>
+                <td style="padding:10px;border:1px solid #ccc">${company.rc || 'Non renseigné'}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px;border:1px solid #ccc"><strong>ICE :</strong></td>
+                <td style="padding:10px;border:1px solid #ccc">${company.ice || 'Non renseigné'}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px;border:1px solid #ccc"><strong>Date de création :</strong></td>
+                <td style="padding:10px;border:1px solid #ccc">${company.date || 'Non renseignée'}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px;border:1px solid #ccc"><strong>Capital social :</strong></td>
+                <td style="padding:10px;border:1px solid #ccc">${company.capital || 'Non renseigné'} DH</td>
+              </tr>
+            </table>
+          </div>
+          
+          <div style="margin-bottom:20px;border:2px solid #333;padding:20px;border-radius:10px">
+            <h2 style="color:#0ea5a4;border-bottom:2px solid #0ea5a4;padding-bottom:10px">INFORMATIONS DU GÉRANT</h2>
+            <table style="width:100%;border-collapse:collapse;margin-top:15px">
+              <tr>
+                <td style="padding:10px;border:1px solid #ccc;width:30%"><strong>Nom complet :</strong></td>
+                <td style="padding:10px;border:1px solid #ccc">${company.manager || 'Non renseigné'}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px;border:1px solid #ccc"><strong>Nationalité :</strong></td>
+                <td style="padding:10px;border:1px solid #ccc">${company.managerNationality === 'marocain' ? 'Marocain' : 'Étranger'}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px;border:1px solid #ccc"><strong>${company.managerNationality === 'marocain' ? 'CIN :' : 'Passeport :'}</strong></td>
+                <td style="padding:10px;border:1px solid #ccc">${company.managerNationality === 'marocain' ? (company.managerCIN || 'Non renseigné') : (company.managerPassport || 'Non renseigné')}</td>
+              </tr>
+            </table>
+          </div>
+          
+          ${company.associates && company.associates.length > 0 ? `
+          <div style="margin-bottom:20px;border:2px solid #333;padding:20px;border-radius:10px">
+            <h2 style="color:#0ea5a4;border-bottom:2px solid #0ea5a4;padding-bottom:10px">ASSOCIÉS</h2>
+            <table style="width:100%;border-collapse:collapse;margin-top:15px">
+              <thead>
+                <tr style="background:#f5f5f5">
+                  <th style="padding:10px;border:1px solid #ccc">Nom</th>
+                  <th style="padding:10px;border:1px solid #ccc">Nationalité</th>
+                  <th style="padding:10px;border:1px solid #ccc">CIN/Passport</th>
+                  <th style="padding:10px;border:1px solid #ccc">Parts</th>
+                  <th style="padding:10px;border:1px solid #ccc">Pourcentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${company.associates.map(assoc => `
+                  <tr>
+                    <td style="padding:10px;border:1px solid #ccc">${assoc.name}</td>
+                    <td style="padding:10px;border:1px solid #ccc">${assoc.nationality === 'marocain' ? 'Marocain' : 'Étranger'}</td>
+                    <td style="padding:10px;border:1px solid #ccc">${assoc.nationality === 'marocain' ? (assoc.cin || 'Non renseigné') : (assoc.passport || 'Non renseigné')}</td>
+                    <td style="padding:10px;border:1px solid #ccc">${assoc.shares}</td>
+                    <td style="padding:10px;border:1px solid #ccc">${assoc.percentage}%</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          ` : ''}
+          
+          <div style="margin-top:40px;text-align:center;font-size:12px;color:#666">
+            <p>Document généré le ${new Date().toLocaleDateString()} - Cabinet Comptable</p>
+          </div>
+        </div>
+      `;
+      
+      generatePDF(printable, `resume-rc-${company.name.replace(/\s+/g, '-')}.pdf`);
+    }
+
+    function searchSocietesList() {
+      const query = searchSocietes.value.toLowerCase();
+      const typeFilter = filterSocieteType.value;
+      const cessionFilter = filterSocieteCession.value;
+      
+      const currentCompanies = getCurrentCabinetCompanies();
+      const filtered = currentCompanies.filter(c => {
+        const matchesText = c.name.toLowerCase().includes(query) || 
+                           c.manager.toLowerCase().includes(query) || 
+                           c.rc.toLowerCase().includes(query);
+        const matchesType = !typeFilter || c.type === typeFilter;
+        const matchesCession = cessionFilter === 'all' || 
+                              (cessionFilter === 'yes' && c.wantsCession) || 
+                              (cessionFilter === 'no' && !c.wantsCession);
+        
+        return matchesText && matchesType && matchesCession;
+      });
+      
+      renderSocietesList(filtered);
+    }
+
+    function clearSocietesSearch() {
+      searchSocietes.value = '';
+      filterSocieteType.value = '';
+      filterSocieteCession.value = 'all';
+      refreshSocietesList();
+    }
+
+    function filterSocietes(filter) {
+      const currentCompanies = getCurrentCabinetCompanies();
+      let filtered = currentCompanies;
+      
+      switch(filter) {
+        case 'SARL':
+          filtered = currentCompanies.filter(c => c.type === 'SARL' || c.type === 'SARL_U');
+          break;
+        case 'SA':
+          filtered = currentCompanies.filter(c => c.type === 'SA');
+          break;
+        case 'cession':
+          filtered = currentCompanies.filter(c => c.wantsCession);
+          break;
+      }
+      
+      renderSocietesList(filtered);
+    }
+
+    function exportAllSocietes() {
+      if (!currentCabinetId) {
+        alert('Veuillez sélectionner un cabinet d\'abord');
+        return;
+      }
+      
+      const currentCabinet = cabinets.find(c => c.id === currentCabinetId);
+      const currentCompanies = getCurrentCabinetCompanies();
+      
+      const data = {
+        cabinet: currentCabinet,
+        companies: currentCompanies,
+        exportDate: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `societes-${currentCabinet.name.replace(/\s+/g, '-')}-${todayISO()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function createModal(title) {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.id = 'modalOverlay';
+      
+      const content = document.createElement('div');
+      content.className = 'modal-content';
+      
+      const header = document.createElement('div');
+      header.className = 'modal-header';
+      
+      const titleEl = document.createElement('h3');
+      titleEl.className = 'modal-title';
+      titleEl.textContent = title;
+      
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'modal-close';
+      closeBtn.innerHTML = '×';
+      closeBtn.onclick = closeModal;
+      
+      header.appendChild(titleEl);
+      header.appendChild(closeBtn);
+      content.appendChild(header);
+      overlay.appendChild(content);
+      document.body.appendChild(overlay);
+      
+      return content;
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('modalOverlay');
+      if (modal) {
+        modal.remove();
+      }
+    }
+
+    // FONCTIONS EXISTANTES (conservées pour la compatibilité)
+
+    // Toggle manager nationality fields
+    function toggleManagerNationality() {
+      const isMarocain = managerNationality.value === 'marocain';
+      managerCINField.style.display = isMarocain ? 'block' : 'none';
+      managerPassportField.style.display = isMarocain ? 'none' : 'block';
+      
+      // Update file accept for passport (PDF allowed for foreigners)
+      managerDocFront.accept = isMarocain ? '.jpg,.jpeg,.png,.gif' : '.pdf,.jpg,.jpeg,.png,.gif';
+    }
+
+    // File upload handler
+    function handleFileUpload(event, previewContainer, fieldName) {
+      const files = event.target.files;
+      previewContainer.innerHTML = '';
+      
+      for (let file of files) {
+        if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            if (file.type === 'application/pdf') {
+              const pdfDiv = document.createElement('div');
+              pdfDiv.className = 'pdf-icon';
+              pdfDiv.innerHTML = `📄 ${file.name}`;
+              pdfDiv.title = file.name;
+              previewContainer.appendChild(pdfDiv);
+            } else {
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.className = 'file-preview';
+              img.title = file.name;
+              previewContainer.appendChild(img);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    }
+
+    // Insert PV Model
+    function insertPVModel() {
+      const pvModel = `PROCÈS-VERBAL DE L'ASSEMBLÉE GÉNÉRALE ORDINAIRE
+
+Société : {{NOM}}
+Forme : {{TYPE_JURIDIQUE}}
+Siège social : ___________________
+RC : {{RC}}
+
+L'assemblée générale ordinaire de la société {{NOM}} s'est tenue le {{DATE}} sous la présidence de {{GERANT}}.
+
+ÉTAIENT PRÉSENTS :
+- {{GERANT}}, gérant
+- [Liste des associés présents]
+
+ÉTAIENT EXCUSÉS :
+- [Liste des associés excusés]
+
+ORDRE DU JOUR :
+1. Approbation des comptes de l'exercice [Année]
+2. Affectation du résultat
+3. Renouvellement des organes de gestion
+4. Questions diverses
+
+DÉLIBÉRATIONS :
+
+1. APPROBATION DES COMPTES
+L'assemblée générale, après avoir pris connaissance du rapport de gestion et des comptes annuels, approuve les comptes de l'exercice [Année] qui se solde par un [bénéfice/perte] de [Montant] DH.
+
+2. AFFECTATION DU RÉSULTAT
+Il est décidé d'affecter le résultat comme suit :
+- Report à nouveau : [Montant] DH
+- Réserve légale : [Montant] DH
+- Dividendes : [Montant] DH
+
+3. RENOUVELLEMENT DES ORGANES DE GESTION
+L'assemblée générale renouvelle la confiance à {{GERANT}} en le maintenant dans ses fonctions de gérant pour une nouvelle durée de [Durée].
+
+4. QUESTIONS DIVERSES
+Aucune autre question n'étant soumise à l'assemblée, la séance est levée à [Heure].
+
+Fait à ________, le {{DATE}}
+
+Le Président,
+{{GERANT}}
+
+Les Associés :
+1. ___________________
+2. ___________________`;
+
+      templateTitle.value = 'PV Assemblée ordinaire';
+      templateType.value = 'pv';
+      templateContent.value = pvModel;
+      currentTemplateId = null;
+    }
+
+    // Gestion des associés
+    function toggleAssociatesSection() {
+      const selectedType = legalType.value;
+      const typeInfo = defaultLegalTypes.find(t => t.code === selectedType);
+      const associatesSection = document.getElementById('associatesSection');
+      
+      if (typeInfo && typeInfo.hasAssociates) {
+        associatesSection.style.display = 'block';
+      } else {
+        associatesSection.style.display = 'none';
+        // Réinitialiser la liste des associés
+        document.getElementById('associatesList').innerHTML = 
+          '<div class="small muted" style="text-align: center; padding: 20px;">Aucun associé ajouté. Cliquez sur "Ajouter un associé" pour commencer.</div>';
+        associateCounter = 0;
+        updateCapitalCalculations();
+      }
+    }
+
+    function addAssociate() {
+      associateCounter++;
+      const associatesList = document.getElementById('associatesList');
+      
+      // Supprimer le message "aucun associé" s'il existe
+      if (associatesList.querySelector('.muted')) {
+        associatesList.innerHTML = '';
+      }
+      
+      const associateDiv = document.createElement('div');
+      associateDiv.className = 'associate-item';
+      associateDiv.style.padding = '12px';
+      associateDiv.style.borderBottom = '1px solid rgba(0,0,0,0.06)';
+      associateDiv.style.marginBottom = '10px';
+      associateDiv.style.background = 'var(--card)';
+      associateDiv.style.borderRadius = '6px';
+      
+      associateDiv.innerHTML = `
+        <div class="associate-header">
+          <strong class="small">Associé #${associateCounter}</strong>
+          <button type="button" class="btn small ghost remove-associate" style="font-size: 11px; padding: 4px 8px;">Supprimer</button>
+        </div>
+        
+        <div class="form-grid cols-2">
+          <div>
+            <label class="small">Nom complet</label>
+            <input type="text" class="associate-name" placeholder="Nom de l'associé" style="font-size: 12px; padding: 6px;">
+          </div>
+          <div>
+            <label class="small">Nationalité</label>
+            <select class="associate-nationality" style="font-size: 12px; padding: 6px;">
+              <option value="marocain">Marocain</option>
+              <option value="etranger">Étranger</option>
+            </select>
+          </div>
+          <div class="associate-cin-field">
+            <label class="small">Numéro CIN</label>
+            <input type="text" class="associate-cin" placeholder="Ex: AB123456" style="font-size: 12px; padding: 6px;">
+          </div>
+          <div class="associate-passport-field" style="display: none;">
+            <label class="small">Numéro de passeport</label>
+            <input type="text" class="associate-passport" placeholder="Numéro de passeport" style="font-size: 12px; padding: 6px;">
+          </div>
+          <div>
+            <label class="small">Pourcentage de parts (%)</label>
+            <input type="number" class="associate-percentage" min="1" max="100" value="0" step="1" style="font-size: 12px; padding: 6px;">
+          </div>
+          <div>
+            <label class="small">Nombre de parts</label>
+            <input type="number" class="associate-shares" min="1" value="0" style="font-size: 12px; padding: 6px; background: rgba(0,0,0,0.05);" readonly>
+          </div>
+          <div>
+            <label class="small">Montant investi (DH)</label>
+            <input type="number" class="associate-amount" value="0" style="font-size: 12px; padding: 6px; background: rgba(0,0,0,0.05);" readonly>
+          </div>
+        </div>
+        
+        <!-- Documents associé -->
+        <div class="form-grid cols-2" style="margin-top: 10px;">
+          <div>
+            <label class="small">Photo CIN Recto / Passeport (PDF ou Image)</label>
+            <div class="file-upload associate-doc-front-upload" style="padding: 10px;">
+              <div class="small">📁 Cliquer pour uploader</div>
+              <input type="file" class="associate-doc-front hidden" accept=".pdf,.jpg,.jpeg,.png,.gif" />
+            </div>
+            <div class="associate-doc-front-preview file-preview-container"></div>
+          </div>
+          <div>
+            <label class="small">Photo CIN Verso (Marocain seulement)</label>
+            <div class="file-upload associate-doc-back-upload" style="padding: 10px;">
+              <div class="small">📁 Cliquer pour uploader</div>
+              <input type="file" class="associate-doc-back hidden" accept=".jpg,.jpeg,.png,.gif" />
+            </div>
+            <div class="associate-doc-back-preview file-preview-container"></div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 8px;">
+          <span class="small associate-summary" style="color: var(--muted);">Parts: 0 | Montant: 0 DH</span>
+        </div>
+      `;
+      
+      associatesList.appendChild(associateDiv);
+      
+      // Ajouter les écouteurs d'événements
+      const percentageInput = associateDiv.querySelector('.associate-percentage');
+      const nameInput = associateDiv.querySelector('.associate-name');
+      const nationalitySelect = associateDiv.querySelector('.associate-nationality');
+      const docFrontInput = associateDiv.querySelector('.associate-doc-front');
+      const docBackInput = associateDiv.querySelector('.associate-doc-back');
+      const docFrontUpload = associateDiv.querySelector('.associate-doc-front-upload');
+      const docBackUpload = associateDiv.querySelector('.associate-doc-back-upload');
+      
+      percentageInput.addEventListener('input', function() {
+        updateAssociateCalculations(this);
+        updateCapitalCalculations();
+      });
+      
+      nameInput.addEventListener('input', updateCapitalCalculations);
+      
+      nationalitySelect.addEventListener('change', function() {
+        const isMarocain = this.value === 'marocain';
+        const cinField = associateDiv.querySelector('.associate-cin-field');
+        const passportField = associateDiv.querySelector('.associate-passport-field');
+        const docFront = associateDiv.querySelector('.associate-doc-front');
+        
+        cinField.style.display = isMarocain ? 'block' : 'none';
+        passportField.style.display = isMarocain ? 'none' : 'block';
+        docFront.accept = isMarocain ? '.jpg,.jpeg,.png,.gif' : '.pdf,.jpg,.jpeg,.png,.gif';
+      });
+      
+      docFrontUpload.addEventListener('click', function() {
+        docFrontInput.click();
+      });
+      
+      docBackUpload.addEventListener('click', function() {
+        docBackInput.click();
+      });
+      
+      docFrontInput.addEventListener('change', function(e) {
+        handleAssociateFileUpload(e, associateDiv.querySelector('.associate-doc-front-preview'), 'front');
+      });
+      
+      docBackInput.addEventListener('change', function(e) {
+        handleAssociateFileUpload(e, associateDiv.querySelector('.associate-doc-back-preview'), 'back');
+      });
+      
+      associateDiv.querySelector('.remove-associate').addEventListener('click', function() {
+        associateDiv.remove();
+        if (associatesList.children.length === 0) {
+          associatesList.innerHTML = '<div class="small muted" style="text-align: center; padding: 20px;">Aucun associé ajouté. Cliquez sur "Ajouter un associé" pour commencer.</div>';
+        }
+        updateCapitalCalculations();
+      });
+      
+      updateCapitalCalculations();
+    }
+
+    function handleAssociateFileUpload(event, previewContainer, type) {
+      const files = event.target.files;
+      previewContainer.innerHTML = '';
+      
+      for (let file of files) {
+        if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            if (file.type === 'application/pdf') {
+              const pdfDiv = document.createElement('div');
+              pdfDiv.className = 'pdf-icon';
+              pdfDiv.innerHTML = `📄 ${file.name}`;
+              pdfDiv.title = file.name;
+              previewContainer.appendChild(pdfDiv);
+            } else {
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.className = 'file-preview';
+              img.title = file.name;
+              previewContainer.appendChild(img);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    }
+
+    function updateAssociateCalculations(inputElement) {
+      const associateDiv = inputElement.closest('.associate-item');
+      const percentage = parseFloat(inputElement.value) || 0;
+      const capital = parseFloat(document.getElementById('companyCapital').value) || 0;
+      const shareValue = parseFloat(document.getElementById('shareValue').value) || 100;
+      
+      const sharesInput = associateDiv.querySelector('.associate-shares');
+      const amountInput = associateDiv.querySelector('.associate-amount');
+      const summarySpan = associateDiv.querySelector('.associate-summary');
+      
+      if (capital > 0 && shareValue > 0) {
+        const totalShares = capital / shareValue;
+        const shares = Math.round((percentage / 100) * totalShares);
+        const amount = shares * shareValue;
+        
+        sharesInput.value = shares;
+        amountInput.value = amount.toFixed(2);
+        summarySpan.textContent = `Parts: ${shares} | Montant: ${amount.toFixed(2)} DH`;
+      } else {
+        sharesInput.value = 0;
+        amountInput.value = 0;
+        summarySpan.textContent = `Parts: 0 | Montant: 0 DH`;
+      }
+    }
+
+    function updateCapitalCalculations() {
+      const capital = parseFloat(document.getElementById('companyCapital').value) || 0;
+      const shareValue = parseFloat(document.getElementById('shareValue').value) || 100;
+      const associates = document.querySelectorAll('.associate-item');
+      
+      let totalShares = 0;
+      let totalCovered = 0;
+      let totalPercentage = 0;
+      
+      associates.forEach(associate => {
+        const shares = parseFloat(associate.querySelector('.associate-shares').value) || 0;
+        const percentage = parseFloat(associate.querySelector('.associate-percentage').value) || 0;
+        totalShares += shares;
+        totalCovered += shares * shareValue;
+        totalPercentage += percentage;
+      });
+      
+      const capitalSummary = document.getElementById('capitalSummary');
+      const remaining = capital - totalCovered;
+      
+      if (associates.length > 0) {
+        capitalSummary.style.display = 'block';
+        document.getElementById('totalShares').textContent = totalShares;
+        document.getElementById('coveredCapital').textContent = totalCovered.toFixed(2) + ' DH';
+        document.getElementById('remainingCapital').textContent = remaining.toFixed(2) + ' DH';
+        
+        const warning = document.getElementById('capitalWarning');
+        if (Math.abs(remaining) > 1 || totalPercentage > 100) {
+          warning.style.display = 'block';
+          if (totalPercentage > 100) {
+            warning.textContent = '⚠️ Le total des pourcentages dépasse 100%';
+          } else {
+            warning.textContent = '⚠️ Le capital n\'est pas entièrement couvert par les parts des associés';
+          }
+        } else {
+          warning.style.display = 'none';
+        }
+      } else {
+        capitalSummary.style.display = 'none';
+      }
+    }
+
+    // Generate PDF function
+    function generatePDF(element, filename) {
+      const opt = {
+        margin: 10,
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    }
+
+    // Cabinet Management
+    function renderCabinetSelector() {
+      cabinetSelect.innerHTML = '<option value="">Choisir un cabinet</option>';
+      
+      cabinets.forEach(cabinet => {
+        const option = document.createElement('option');
+        option.value = cabinet.id;
+        option.textContent = cabinet.name;
+        if (cabinet.id === currentCabinetId) {
+          option.selected = true;
+        }
+        cabinetSelect.appendChild(option);
+      });
+    }
+
+    function updateCabinetDisplay() {
+      const currentCabinet = cabinets.find(c => c.id === currentCabinetId);
+      
+      if (currentCabinet) {
+        currentCabinetBadge.textContent = currentCabinet.name;
+        currentCabinetBadge.classList.remove('hidden');
+        mainTitle.textContent = `${currentCabinet.name} — CABINET DE COMPTABILITE`;
+        dashboardTitle.textContent = `Tableau de bord - ${currentCabinet.name}`;
+        
+        // Enable all functionality
+        newCompanyBtn.disabled = false;
+        manageTemplatesBtn.disabled = false;
+        manageCessionsBtn.disabled = false;
+        exportBtn.disabled = false;
+        importBtn.disabled = false;
+      } else {
+        currentCabinetBadge.classList.add('hidden');
+        mainTitle.textContent = 'Cabinet Comptable — Application LocalStorage';
+        dashboardTitle.textContent = 'Tableau de bord';
+        
+        // Disable functionality when no cabinet selected
+        newCompanyBtn.disabled = true;
+        manageTemplatesBtn.disabled = true;
+        manageCessionsBtn.disabled = true;
+        exportBtn.disabled = true;
+        importBtn.disabled = true;
+      }
+    }
+
+    function getCurrentCabinetCompanies() {
+      if (!currentCabinetId) return [];
+      return companies.filter(c => c.cabinetId === currentCabinetId);
+    }
+
+    function getCurrentCabinetTemplates() {
+      if (!currentCabinetId) return [];
+      return templates.filter(t => t.cabinetId === currentCabinetId);
+    }
+
+    function getCurrentCabinetCessions() {
+      if (!currentCabinetId) return [];
+      return cessions.filter(c => c.cabinetId === currentCabinetId);
+    }
+
+    function getCurrentCabinetReminders() {
+      if (!currentCabinetId) return [];
+      return reminders.filter(r => r.cabinetId === currentCabinetId);
+    }
+
+    createCabinetBtn.addEventListener('click', () => {
+      const name = cabinetName.value.trim();
+      const address = cabinetAddress.value.trim();
+      const phone = cabinetPhone.value.trim();
+      const email = cabinetEmail.value.trim();
+      
+      if (!name) {
+        alert('Le nom du cabinet est requis');
+        return;
+      }
+      
+      const newCabinet = {
+        id: genId(),
+        name,
+        address,
+        phone,
+        email,
+        created: todayISO()
+      };
+      
+      cabinets.push(newCabinet);
+      save(LS_KEYS.CABINETS, cabinets);
+      
+      // Select the new cabinet automatically
+      currentCabinetId = newCabinet.id;
+      localStorage.setItem(LS_KEYS.CURRENT_CABINET, currentCabinetId);
+      
+      renderCabinetSelector();
+      updateCabinetDisplay();
+      refreshCounts();
+      
+      // Clear form
+      cabinetName.value = '';
+      cabinetAddress.value = '';
+      cabinetPhone.value = '';
+      cabinetEmail.value = '';
+      
+      alert(`Cabinet "${name}" créé avec succès !`);
+    });
+
+    manageCabinetsBtn.addEventListener('click', () => {
+      cabinetsListCard.classList.remove('hidden');
+      renderCabinetsList();
+    });
+
+    closeCabinetsListBtn.addEventListener('click', () => {
+      cabinetsListCard.classList.add('hidden');
+    });
+
+    function renderCabinetsList() {
+      cabinetsList.innerHTML = '';
+      
+      if (cabinets.length === 0) {
+        cabinetsList.innerHTML = '<p class="muted">Aucun cabinet créé</p>';
+        return;
+      }
+      
+      cabinets.forEach(cabinet => {
+        const div = document.createElement('div');
+        div.style.padding = '12px';
+        div.style.borderBottom = '1px solid rgba(0,0,0,0.06)';
+        div.style.marginBottom = '8px';
+        
+        const header = document.createElement('div');
+        header.style.display = 'flex';
+        header.style.justifyContent = 'space-between';
+        header.style.alignItems = 'flex-start';
+        header.style.marginBottom = '8px';
+        
+        const name = document.createElement('div');
+        name.style.fontWeight = '600';
+        name.textContent = cabinet.name;
+        
+        const details = document.createElement('div');
+        details.className = 'small muted';
+        details.innerHTML = `
+          <div>${cabinet.address || 'Adresse non spécifiée'}</div>
+          <div>${cabinet.phone || 'Téléphone non spécifié'} - ${cabinet.email || 'Email non spécifié'}</div>
+          <div>Créé le ${cabinet.created}</div>
+        `;
+        
+        const actions = document.createElement('div');
+        actions.style.display = 'flex';
+        actions.style.gap = '8px';
+        actions.style.marginTop = '8px';
+        
+        const selectBtn = document.createElement('button');
+        selectBtn.className = 'btn small';
+        selectBtn.textContent = 'Sélectionner';
+        selectBtn.onclick = () => {
+          currentCabinetId = cabinet.id;
+          localStorage.setItem(LS_KEYS.CURRENT_CABINET, currentCabinetId);
+          renderCabinetSelector();
+          updateCabinetDisplay();
+          refreshCounts();
+          renderCompaniesTable(getCurrentCabinetCompanies());
+          renderReminders();
+          renderCessionsTable();
+          cabinetsListCard.classList.add('hidden');
+        };
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn small ghost';
+        deleteBtn.textContent = 'Supprimer';
+        deleteBtn.onclick = () => {
+          if (confirm(`Supprimer le cabinet "${cabinet.name}" ? Cette action supprimera également toutes les sociétés et données associées.`)) {
+            // Delete cabinet and associated data
+            cabinets = cabinets.filter(c => c.id !== cabinet.id);
+            companies = companies.filter(c => c.cabinetId !== cabinet.id);
+            templates = templates.filter(t => t.cabinetId !== cabinet.id);
+            cessions = cessions.filter(ces => ces.cabinetId !== cabinet.id);
+            reminders = reminders.filter(r => r.cabinetId !== cabinet.id);
+            
+            // If deleted cabinet was current, clear selection
+            if (currentCabinetId === cabinet.id) {
+              currentCabinetId = '';
+              localStorage.removeItem(LS_KEYS.CURRENT_CABINET);
+            }
+            
+            saveAll();
+            renderCabinetSelector();
+            updateCabinetDisplay();
+            refreshCounts();
+            renderCompaniesTable(getCurrentCabinetCompanies());
+            renderReminders();
+            renderCessionsTable();
+            renderCabinetsList();
+          }
+        };
+        
+        actions.appendChild(selectBtn);
+        actions.appendChild(deleteBtn);
+        
+        div.appendChild(name);
+        div.appendChild(details);
+        div.appendChild(actions);
+        cabinetsList.appendChild(div);
+      });
+    }
+
+    cabinetSelect.addEventListener('change', () => {
+      currentCabinetId = cabinetSelect.value;
+      localStorage.setItem(LS_KEYS.CURRENT_CABINET, currentCabinetId);
+      updateCabinetDisplay();
+      refreshCounts();
+      renderCompaniesTable(getCurrentCabinetCompanies());
+      renderReminders();
+      renderCessionsTable();
+    });
+
+    function renderTemplateOptions() {
+      templateStatuts.innerHTML = '';
+      templatePV.innerHTML = '';
+      
+      const currentTemplates = getCurrentCabinetTemplates();
+      
+      currentTemplates.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t.id;
+        option.textContent = t.title;
+        
+        if (t.type === 'statuts') {
+          templateStatuts.appendChild(option);
+        } else if (t.type === 'pv') {
+          templatePV.appendChild(option);
+        }
+      });
+    }
+
+    function refreshCounts() {
+      const currentCompanies = getCurrentCabinetCompanies();
+      const currentReminders = getCurrentCabinetReminders();
+      const currentTemplates = getCurrentCabinetTemplates();
+      const currentCessions = getCurrentCabinetCessions();
+      
+      countCompanies.textContent = currentCompanies.length;
+      countReminders.textContent = currentReminders.length;
+      countTemplates.textContent = currentTemplates.length;
+      countCessions.textContent = currentCessions.length;
+    }
+
+    // Authentication
+    loginBtn.addEventListener('click', () => {
+      const username = document.getElementById('loginUser').value.trim();
+      const password = document.getElementById('loginPass').value;
+      
+      if (username === admin.user && password === admin.pass) {
+        loginSection.classList.add('hidden');
+        appDiv.classList.remove('hidden');
+        userBadge.textContent = admin.user;
+        initUI();
+      } else {
+        alert('Identifiant ou mot de passe incorrect');
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      appDiv.classList.add('hidden');
+      loginSection.classList.remove('hidden');
+    });
+
+    initBtn.addEventListener('click', () => {
+      if (confirm('Initialiser avec des données exemple ?')) {
+        // Create a default cabinet
+        const defaultCabinet = {
+          id: genId(),
+          name: 'Cabinet Principal',
+          address: 'Casablanca, Maroc',
+          phone: '+212 5 22 22 22 22',
+          email: 'contact@cabinet.ma',
+          created: todayISO()
+        };
+        
+        cabinets = [defaultCabinet];
+        currentCabinetId = defaultCabinet.id;
+        
+        companies = [
+          {
+            id: genId(),
+            cabinetId: defaultCabinet.id,
+            name: 'WE WORLD ENERGY',
+            type: 'SARL',
+            rc: 'RC12345',
+            ice: 'ICE456',
+            date: '2024-05-10',
+            manager: 'Faicel',
+            managerNationality: 'marocain',
+            managerCIN: 'AB123456',
+            managerPassport: '',
+            capital: '100000',
+            shareValue: '100',
+            phone: '0600000000',
+            email: 'contact@weworld.com',
+            address: 'Casablanca',
+            notes: 'Client important',
+            wantsCession: false,
+            // CORRECTION 1: Ajouter les modèles sélectionnés
+            templateStatuts: 'tpl1',
+            templatePV: 'tpl2',
+            associates: [
+              {
+                id: genId(),
+                name: 'Faicel',
+                nationality: 'marocain',
+                cin: 'AB123456',
+                passport: '',
+                percentage: 60,
+                shares: 600,
+                amount: 60000
+              },
+              {
+                id: genId(),
+                name: 'Associé 2',
+                nationality: 'etranger',
+                cin: '',
+                passport: 'P12345678',
+                percentage: 40,
+                shares: 400,
+                amount: 40000
+              }
+            ]
+          }
+        ];
+        templates = defaultTemplates.map(t => ({
+          ...t,
+          cabinetId: defaultCabinet.id
+        }));
+        reminders = [];
+        cessions = [];
+        
+        saveAll();
+        localStorage.setItem(LS_KEYS.CURRENT_CABINET, currentCabinetId);
+        alert('Données exemple créées. Connectez-vous avec admin/admin123.');
+        location.reload();
+      }
+    });
+
+    // Templates Management
+    manageTemplatesBtn.addEventListener('click', () => {
+      templatesCard.classList.remove('hidden');
+      cessionsCard.classList.add('hidden');
+      renderTemplatesList();
+    });
+
+    cancelTemplateBtn.addEventListener('click', () => {
+      templatesCard.classList.add('hidden');
+      currentTemplateId = null;
+      templateTitle.value = '';
+      templateContent.value = '';
+    });
+
+    function renderTemplatesList() {
+      templatesList.innerHTML = '';
+      const currentTemplates = getCurrentCabinetTemplates();
+      
+      currentTemplates.forEach(t => {
+        const div = document.createElement('div');
+        div.style.padding = '10px';
+        div.style.borderBottom = '1px solid rgba(0,0,0,0.06)';
+        div.style.marginBottom = '8px';
+        
+        const title = document.createElement('div');
+        title.textContent = t.title + ' (' + t.type + ')';
+        title.style.fontWeight = '600';
+        title.style.marginBottom = '5px';
+        
+        const preview = document.createElement('div');
+        preview.textContent = t.content.substring(0, 100) + '...';
+        preview.className = 'small muted';
+        preview.style.marginBottom = '8px';
+        
+        const btnGroup = document.createElement('div');
+        btnGroup.style.display = 'flex';
+        btnGroup.style.gap = '8px';
+        
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn small ghost';
+        editBtn.textContent = 'Éditer';
+        editBtn.onclick = () => {
+          templateTitle.value = t.title;
+          templateType.value = t.type;
+          templateContent.value = t.content;
+          currentTemplateId = t.id;
+        };
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn small';
+        deleteBtn.textContent = 'Supprimer';
+        deleteBtn.onclick = () => {
+          if (confirm('Supprimer ce modèle ?')) {
+            templates = templates.filter(x => x.id !== t.id);
+            save(LS_KEYS.TPL, templates);
+            renderTemplatesList();
+            renderTemplateOptions();
+            refreshCounts();
+          }
+        };
+        
+        btnGroup.appendChild(editBtn);
+        btnGroup.appendChild(deleteBtn);
+        
+        div.appendChild(title);
+        div.appendChild(preview);
+        div.appendChild(btnGroup);
+        templatesList.appendChild(div);
+      });
+    }
+
+    saveTemplateBtn.addEventListener('click', () => {
+      const title = templateTitle.value.trim();
+      const type = templateType.value;
+      const content = templateContent.value.trim();
+      
+      if (!title || !content) {
+        alert('Le titre et le contenu sont requis');
+        return;
+      }
+      
+      if (!currentCabinetId) {
+        alert('Veuillez sélectionner un cabinet d\'abord');
+        return;
+      }
+      
+      if (currentTemplateId) {
+        // Update existing template
+        templates = templates.map(t => 
+          t.id === currentTemplateId ? { ...t, title, type, content } : t
+        );
+      } else {
+        // Create new template
+        templates.push({
+          id: genId(),
+          cabinetId: currentCabinetId,
+          title,
+          type,
+          content
+        });
+      }
+      
+      save(LS_KEYS.TPL, templates);
+      renderTemplatesList();
+      renderTemplateOptions();
+      refreshCounts();
+      
+      templateTitle.value = '';
+      templateContent.value = '';
+      currentTemplateId = null;
+    });
+
+    insertOnlineModelBtn.addEventListener('click', () => {
+      const longSARLModel = `STATUTS DE LA SOCIÉTÉ À RESPONSABILITÉ LIMITÉE
+
+DÉNOMINATION : {{NOM}}
+FORME : {{TYPE_JURIDIQUE}}
+SIÈGE SOCIAL : ___________________
+OBJET SOCIAL : ___________________
+CAPITAL SOCIAL : _________ DH
+DURÉE : 99 ans
+
+ARTICLE 1 - CONSTITUTION
+Les associés fondateurs ont décidé de constituer une société à responsabilité limitée sous la dénomination "{{NOM}}".
+
+ARTICLE 2 - FORME JURIDIQUE
+La société est une Société à Responsabilité Limitée (SARL), régie par les dispositions de la loi 5-96 relative à la société à responsabilité limitée et par les présents statuts.
+
+ARTICLE 3 - DÉNOMINATION
+La société est dénommée : {{NOM}}
+
+ARTICLE 4 - SIÈGE SOCIAL
+Le siège social est fixé à : ___________________
+Il peut être transféré en tout autre lieu par décision des associés.
+
+ARTICLE 5 - DURÉE
+La durée de la société est de quatre-vingt-dix-neuf (99) ans à compter de son immatriculation au Registre de Commerce.
+
+ARTICLE 6 - OBJET SOCIAL
+L'objet social est : ___________________
+La société peut exercer toutes activités commerciales, industrielles, civiles ou de services se rattachant directement ou indirectement à son objet social.
+
+ARTICLE 7 - CAPITAL SOCIAL
+Le capital social est fixé à la somme de _________ DH, divisé en _______ parts sociales de _______ DH chacune.
+
+ARTICLE 8 - ASSOCIÉS
+Les associés sont au nombre de _______.
+Noms et adresses des associés :
+1. ___________________
+2. ___________________
+
+ARTICLE 9 - GÉRANCE
+La gérance est assurée par : {{GERANT}}
+Le gérant est nommé pour une durée indéterminée.
+Il dispose des pouvoirs les plus étendus pour agir au nom de la société.
+
+ARTICLE 10 - EXERCICE SOCIAL
+L'exercice social commence le 1er janvier et se termine le 31 décembre de chaque année.
+
+ARTICLE 11 - RÉPARTITION DES BÉNÉFICES
+Les bénéfices sont répartis conformément aux dispositions légales et aux droits respectifs des associés.
+
+Fait à ________, le {{DATE}}
+
+LES ASSOCIÉS FONDATEURS :
+1. ___________________
+2. ___________________`;
+
+      templateTitle.value = 'Statuts SARL long';
+      templateType.value = 'statuts';
+      templateContent.value = longSARLModel;
+      currentTemplateId = null;
+    });
+
+    // Cessions Management
+    manageCessionsBtn.addEventListener('click', () => {
+      cessionsCard.classList.remove('hidden');
+      templatesCard.classList.add('hidden');
+      renderCessionsTable();
+    });
+
+    newCessionBtn.addEventListener('click', () => {
+      if (!currentCabinetId) {
+        alert('Veuillez sélectionner un cabinet d\'abord');
+        return;
+      }
+      
+      cessionForm.classList.remove('hidden');
+      cessionsListContainer.classList.add('hidden');
+      cessionFormTitle.textContent = 'Nouvelle cession de parts';
+      
+      // Populate companies dropdown with current cabinet companies only
+      cessionCompany.innerHTML = '';
+      const currentCompanies = getCurrentCabinetCompanies();
+      currentCompanies.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.id;
+        option.textContent = c.name;
+        cessionCompany.appendChild(option);
+      });
+      
+      // Set default values
+      cessionDate.value = todayISO();
+      cessionCedant.value = '';
+      cessionCedantAddress.value = '';
+      cessionCessionnaire.value = '';
+      cessionCessionnaireAddress.value = '';
+      cessionPartsCount.value = '';
+      cessionPrice.value = '';
+      cessionPaymentMode.value = 'comptant';
+      cessionConditions.value = '';
+      editingCessionId = null;
+    });
+
+    cancelCessionBtn.addEventListener('click', () => {
+      cessionForm.classList.add('hidden');
+      cessionsListContainer.classList.remove('hidden');
+    });
+
+    saveCessionBtn.addEventListener('click', () => {
+      const companyId = cessionCompany.value;
+      const company = companies.find(c => c.id === companyId);
+      
+      if (!company) {
+        alert('Veuillez sélectionner une société');
+        return;
+      }
+      
+      const cessionData = {
+        companyId,
+        cabinetId: currentCabinetId,
+        companyName: company.name,
+        date: cessionDate.value,
+        cedant: cessionCedant.value,
+        cedantAddress: cessionCedantAddress.value,
+        cessionnaire: cessionCessionnaire.value,
+        cessionnaireAddress: cessionCessionnaireAddress.value,
+        partsCount: parseInt(cessionPartsCount.value) || 0,
+        price: parseFloat(cessionPrice.value) || 0,
+        paymentMode: cessionPaymentMode.value,
+        conditions: cessionConditions.value
+      };
+      
+      if (!cessionData.cedant || !cessionData.cessionnaire || !cessionData.partsCount) {
+        alert('Veuillez remplir tous les champs obligatoires');
+        return;
+      }
+      
+      if (editingCessionId) {
+        // Update existing cession
+        cessions = cessions.map(c => 
+          c.id === editingCessionId ? { ...c, ...cessionData } : c
+        );
+      } else {
+        // Create new cession
+        cessions.push({
+          id: genId(),
+          ...cessionData
+        });
+      }
+      
+      save(LS_KEYS.CESSIONS, cessions);
+      renderCessionsTable();
+      refreshCounts();
+      
+      cessionForm.classList.add('hidden');
+      cessionsListContainer.classList.remove('hidden');
+      editingCessionId = null;
+    });
+
+    function renderCessionsTable() {
+      cessionsTable.innerHTML = '';
+      const currentCessions = getCurrentCabinetCessions();
+      
+      if (currentCessions.length === 0) {
+        cessionsTable.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px">Aucune cession enregistrée</td></tr>';
+        return;
+      }
+      
+      currentCessions.forEach(c => {
+        const tr = document.createElement('tr');
+        
+        tr.innerHTML = `
+          <td>${c.companyName}</td>
+          <td>${c.cedant}</td>
+          <td>${c.cessionnaire}</td>
+          <td>${c.partsCount}</td>
+          <td>${c.price.toLocaleString()} DH</td>
+          <td>${c.date}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn small ghost" onclick="editCession('${c.id}')">Éditer</button>
+              <button class="btn small" onclick="deleteCession('${c.id}')">Supprimer</button>
+              <button class="btn small" onclick="generateCessionDocument('${c.id}')">Document</button>
+              <!-- CORRECTION 2: Bouton pour télécharger la CIN du cessionnaire -->
+              <button class="btn small" onclick="downloadCessionCIN('${c.id}')">📄 CIN</button>
+            </div>
+          </td>
+        `;
+        
+        cessionsTable.appendChild(tr);
+      });
+    }
+
+    window.editCession = function(id) {
+      const cession = cessions.find(c => c.id === id);
+      if (!cession) return;
+      
+      cessionForm.classList.remove('hidden');
+      cessionsListContainer.classList.add('hidden');
+      cessionFormTitle.textContent = 'Modifier la cession de parts';
+      
+      // Populate companies dropdown with current cabinet companies only
+      cessionCompany.innerHTML = '';
+      const currentCompanies = getCurrentCabinetCompanies();
+      currentCompanies.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.id;
+        option.textContent = c.name;
+        if (c.id === cession.companyId) option.selected = true;
+        cessionCompany.appendChild(option);
+      });
+      
+      // Fill form with cession data
+      cessionDate.value = cession.date;
+      cessionCedant.value = cession.cedant;
+      cessionCedantAddress.value = cession.cedantAddress;
+      cessionCessionnaire.value = cession.cessionnaire;
+      cessionCessionnaireAddress.value = cession.cessionnaireAddress;
+      cessionPartsCount.value = cession.partsCount;
+      cessionPrice.value = cession.price;
+      cessionPaymentMode.value = cession.paymentMode;
+      cessionConditions.value = cession.conditions;
+      
+      editingCessionId = id;
+    };
+
+    window.deleteCession = function(id) {
+      if (confirm('Supprimer cette cession ?')) {
+        cessions = cessions.filter(c => c.id !== id);
+        save(LS_KEYS.CESSIONS, cessions);
+        renderCessionsTable();
+        refreshCounts();
+      }
+    };
+
+    // CORRECTION 2: Fonction pour télécharger la CIN du cessionnaire
+    window.downloadCessionCIN = function(id) {
+      const cession = cessions.find(c => c.id === id);
+      if (!cession) return;
+      
+      const company = companies.find(c => c.id === cession.companyId);
+      if (!company) return;
+      
+      const printable = document.getElementById('printable');
+      
+      let cinContent = '';
+      if (company.managerNationality === 'marocain' && company.managerCIN) {
+        cinContent = `
+          <h3 style="text-align:center">CARTE D'IDENTITÉ NATIONALE - CESSIONNAIRE</h3>
+          <div style="border:2px solid #333;padding:20px;border-radius:10px;margin:20px 0">
+            <p><strong>Nom complet :</strong> ${cession.cessionnaire}</p>
+            <p><strong>Numéro CIN :</strong> ${company.managerCIN}</p>
+            <p><strong>Société :</strong> ${company.name}</p>
+            <p><strong>RC :</strong> ${company.rc}</p>
+            <p><strong>Qualité :</strong> Cessionnaire (acquéreur)</p>
+            <p><strong>Date de la cession :</strong> ${cession.date}</p>
+            <p><strong>Nombre de parts acquises :</strong> ${cession.partsCount}</p>
+            <p><strong>Prix de cession :</strong> ${cession.price} DH</p>
+          </div>
+        `;
+      } else if (company.managerPassport) {
+        cinContent = `
+          <h3 style="text-align:center">PASSEPORT - CESSIONNAIRE</h3>
+          <div style="border:2px solid #333;padding:20px;border-radius:10px;margin:20px 0">
+            <p><strong>Nom complet :</strong> ${cession.cessionnaire}</p>
+            <p><strong>Numéro de passeport :</strong> ${company.managerPassport}</p>
+            <p><strong>Société :</strong> ${company.name}</p>
+            <p><strong>RC :</strong> ${company.rc}</p>
+            <p><strong>Qualité :</strong> Cessionnaire (acquéreur)</p>
+            <p><strong>Date de la cession :</strong> ${cession.date}</p>
+            <p><strong>Nombre de parts acquises :</strong> ${cession.partsCount}</p>
+            <p><strong>Prix de cession :</strong> ${cession.price} DH</p>
+          </div>
+        `;
+      } else {
+        alert('Aucune information CIN ou passeport disponible pour le cessionnaire');
+        return;
+      }
+      
+      printable.innerHTML = `
+        <div style="font-family:Arial,sans-serif;padding:20px;max-width:800px;margin:0 auto">
+          <h1 style="text-align:center;margin-bottom:30px">DOCUMENT D'IDENTITÉ - CESSIONNAIRE</h1>
+          ${cinContent}
+          <div style="margin-top:30px;text-align:center;font-size:12px;color:#666">
+            <p>Document généré le ${new Date().toLocaleDateString()} - Cabinet Comptable</p>
+          </div>
+        </div>
+      `;
+      
+      generatePDF(printable, `cin-cessionnaire-${company.name.replace(/\s+/g, '-')}-${cession.date}.pdf`);
+    };
+
+    generateCessionDocBtn.addEventListener('click', () => {
+      const companyId = cessionCompany.value;
+      const company = companies.find(c => c.id === companyId);
+      
+      if (!company) {
+        alert('Veuillez sélectionner une société');
+        return;
+      }
+      
+      const cessionData = {
+        companyName: company.name,
+        date: cessionDate.value,
+        cedant: cessionCedant.value,
+        cedantAddress: cessionCedantAddress.value,
+        cessionnaire: cessionCessionnaire.value,
+        cessionnaireAddress: cessionCessionnaireAddress.value,
+        partsCount: parseInt(cessionPartsCount.value) || 0,
+        price: parseFloat(cessionPrice.value) || 0,
+        paymentMode: cessionPaymentMode.value,
+        conditions: cessionConditions.value
+      };
+      
+      generateCessionDocumentFromData(cessionData);
+    });
+
+    window.generateCessionDocument = function(id) {
+      const cession = cessions.find(c => c.id === id);
+      if (!cession) return;
+      
+      generateCessionDocumentFromData(cession);
+    };
+
+    function generateCessionDocumentFromData(cession) {
+      const company = companies.find(c => c.id === cession.companyId);
+      const printable = document.getElementById('printable');
+      
+      // CORRECTION 2: Ajouter les informations CIN dans le document
+      let cinInfo = '';
+      if (company) {
+        if (company.managerNationality === 'marocain' && company.managerCIN) {
+          cinInfo = `<p><strong>CIN du Cessionnaire :</strong> ${company.managerCIN}</p>`;
+        } else if (company.managerPassport) {
+          cinInfo = `<p><strong>Passeport du Cessionnaire :</strong> ${company.managerPassport}</p>`;
+        }
+      }
+      
+      printable.innerHTML = `
+        <div style="font-family:Arial,sans-serif;padding:20px;max-width:800px;margin:0 auto">
+          <h1 style="text-align:center;margin-bottom:30px">CONTRAT DE CESSION DE PARTS SOCIALES</h1>
+          
+          <div style="margin-bottom:20px">
+            <p><strong>ENTRE LES SOUSSIGNÉS :</strong></p>
+            <p><strong>Monsieur/Madame :</strong> ${cession.cedant}</p>
+            <p><strong>Demeurant à :</strong> ${cession.cedantAddress}</p>
+            <p>Ci-après dénommé le "<strong>CÉDANT</strong>"</p>
+          </div>
+          
+          <div style="margin-bottom:20px">
+            <p><strong>ET</strong></p>
+            <p><strong>Monsieur/Madame :</strong> ${cession.cessionnaire}</p>
+            <p><strong>Demeurant à :</strong> ${cession.cessionnaireAddress}</p>
+            ${cinInfo}
+            <p>Ci-après dénommé le "<strong>CESSIONNAIRE</strong>"</p>
+          </div>
+          
+          <div style="margin-bottom:20px">
+            <p><strong>IL A ÉTÉ CONVENU CE QUI SUIT :</strong></p>
+          </div>
+          
+          <div style="margin-bottom:15px">
+            <p><strong>ARTICLE 1 - OBJET</strong></p>
+            <p>Le CÉDANT cède au CESSIONNAIRE, qui l'accepte, ${cession.partsCount} parts sociales de la société <strong>${cession.companyName}</strong>, représentant une partie du capital social de ladite société.</p>
+          </div>
+          
+          <div style="margin-bottom:15px">
+            <p><strong>ARTICLE 2 - PRIX</strong></p>
+            <p>Le prix de la cession est fixé à la somme de <strong>${cession.price.toLocaleString()} Dirhams (${cession.price} DH)</strong>.</p>
+          </div>
+          
+          <div style="margin-bottom:15px">
+            <p><strong>ARTICLE 3 - MODALITÉS DE PAIEMENT</strong></p>
+            <p>Le paiement s'effectuera ${getPaymentModeText(cession.paymentMode)}.</p>
+          </div>
+          
+          ${cession.conditions ? `
+          <div style="margin-bottom:15px">
+            <p><strong>ARTICLE 4 - CONDITIONS PARTICULIÈRES</strong></p>
+            <p>${cession.conditions}</p>
+          </div>
+          ` : ''}
+          
+          <div style="margin-bottom:15px">
+            <p><strong>ARTICLE ${cession.conditions ? '5' : '4'} - EFFETS</strong></p>
+            <p>La présente cession produira ses effets à compter de ce jour, sous réserve de l'accomplissement des formalités légales de publicité.</p>
+          </div>
+          
+          <div style="margin-top:40px">
+            <p>Fait à ________, le ${cession.date}</p>
+            
+            <div style="display:flex;justify-content:space-between;margin-top:60px">
+              <div style="text-align:center">
+                <p>Le CÉDANT</p>
+                <p style="margin-top:50px">${cession.cedant}</p>
+              </div>
+              
+              <div style="text-align:center">
+                <p>Le CESSIONNAIRE</p>
+                <p style="margin-top:50px">${cession.cessionnaire}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Generate PDF instead of printing
+      generatePDF(printable, `cession-parts-${cession.companyName.replace(/\s+/g, '-')}-${cession.date}.pdf`);
+    }
+
+    function getPaymentModeText(mode) {
+      switch(mode) {
+        case 'comptant': return 'au comptant';
+        case 'echeances': return 'en plusieurs échéances selon les conditions convenues entre les parties';
+        case 'autre': return 'selon des modalités particulières convenues entre les parties';
+        default: return mode;
+      }
+    }
+
+    // Companies Management
+    newCompanyBtn.addEventListener('click', () => {
+      if (!currentCabinetId) {
+        alert('Veuillez sélectionner un cabinet d\'abord');
+        return;
+      }
+      
+      companyFormCard.classList.remove('hidden');
+      companyFormTitle.textContent = 'Créer une société';
+      editingCompanyId = null;
+      
+      // Reset form
+      companyName.value = '';
+      legalType.value = '';
+      companyRC.value = '';
+      companyICE.value = '';
+      companyDate.value = todayISO();
+      companyManager.value = '';
+      companyCapital.value = '';
+      document.getElementById('shareValue').value = '100';
+      companyPhone.value = '';
+      companyAddress.value = '';
+      companyEmail.value = '';
+      wantsCession.value = 'no';
+      cessionReminderDate.value = '';
+      companyNotes.value = '';
+      
+      // Reset manager fields
+      managerNationality.value = 'marocain';
+      managerCIN.value = '';
+      managerPassport.value = '';
+      managerDocFrontPreview.innerHTML = '';
+      managerDocBackPreview.innerHTML = '';
+      toggleManagerNationality();
+      
+      // Reset RC document
+      companyRCDocPreview.innerHTML = '';
+      
+      // Réinitialiser les associés
+      document.getElementById('associatesList').innerHTML = 
+        '<div class="small muted" style="text-align: center; padding: 20px;">Aucun associé ajouté. Cliquez sur "Ajouter un associé" pour commencer.</div>';
+      associateCounter = 0;
+      document.getElementById('associatesSection').style.display = 'none';
+      document.getElementById('capitalSummary').style.display = 'none';
+    });
+
+    saveCompanyBtn.addEventListener('click', () => {
+      const companyData = {
+        name: companyName.value.trim(),
+        type: legalType.value,
+        rc: companyRC.value.trim(),
+        ice: companyICE.value.trim(),
+        date: companyDate.value,
+        manager: companyManager.value.trim(),
+        managerNationality: managerNationality.value,
+        managerCIN: managerCIN.value.trim(),
+        managerPassport: managerPassport.value.trim(),
+        capital: companyCapital.value.trim(),
+        shareValue: document.getElementById('shareValue').value,
+        phone: companyPhone.value.trim(),
+        address: companyAddress.value.trim(),
+        email: companyEmail.value.trim(),
+        wantsCession: wantsCession.value === 'yes',
+        cessionReminderDate: cessionReminderDate.value,
+        notes: companyNotes.value.trim(),
+        // CORRECTION 1: Sauvegarder les modèles sélectionnés
+        templateStatuts: templateStatuts.value,
+        templatePV: templatePV.value,
+        associates: []
+      };
+      
+      // Récupérer les données des associés si la section est visible
+      if (document.getElementById('associatesSection').style.display !== 'none') {
+        const associateItems = document.querySelectorAll('.associate-item');
+        associateItems.forEach(item => {
+          const name = item.querySelector('.associate-name').value.trim();
+          const nationality = item.querySelector('.associate-nationality').value;
+          const cin = item.querySelector('.associate-cin').value.trim();
+          const passport = item.querySelector('.associate-passport').value.trim();
+          const percentage = parseFloat(item.querySelector('.associate-percentage').value) || 0;
+          const shares = parseFloat(item.querySelector('.associate-shares').value) || 0;
+          const amount = parseFloat(item.querySelector('.associate-amount').value) || 0;
+          
+          if (name && percentage > 0) {
+            companyData.associates.push({
+              id: genId(),
+              name: name,
+              nationality: nationality,
+              cin: cin,
+              passport: passport,
+              percentage: percentage,
+              shares: shares,
+              amount: amount
+            });
+          }
+        });
+      }
+      
+      if (!companyData.name || !companyData.type || !companyData.manager) {
+        alert('Nom, type juridique et gérant sont requis');
+        return;
+      }
+      
+      // Vérifier que le capital est couvert pour les types avec associés
+      const typeInfo = defaultLegalTypes.find(t => t.code === companyData.type);
+      if (typeInfo && typeInfo.hasAssociates && companyData.associates.length === 0) {
+        alert('Veuillez ajouter au moins un associé pour ce type de société');
+        return;
+      }
+      
+      if (editingCompanyId) {
+        // Update existing company
+        companies = companies.map(c => 
+          c.id === editingCompanyId ? { ...c, ...companyData } : c
+        );
+      } else {
+        // Create new company
+        companies.push({
+          id: genId(),
+          cabinetId: currentCabinetId,
+          ...companyData
+        });
+      }
+      
+      save(LS_KEYS.COMP, companies);
+      renderCompaniesTable(getCurrentCabinetCompanies());
+      refreshCounts();
+      updateReminders();
+      renderReminders();
+      refreshSocietesList(); // Actualiser la liste des sociétés
+      
+      companyFormCard.classList.add('hidden');
+      editingCompanyId = null;
+    });
+
+    cancelCompanyBtn.addEventListener('click', () => {
+      companyFormCard.classList.add('hidden');
+      editingCompanyId = null;
+    });
+
+    function renderCompaniesTable(list) {
+      companiesTable.innerHTML = '';
+      companiesMobileList.innerHTML = '';
+      
+      if (list.length === 0) {
+        companiesTable.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px">Aucune société trouvée</td></tr>';
+        companiesMobileList.innerHTML = '<div style="text-align:center;padding:20px">Aucune société trouvée</div>';
+        return;
+      }
+      
+      list.forEach(c => {
+        // Desktop table row
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${c.name}</td>
+          <td>${getLegalTypeLabel(c.type)}</td>
+          <td>${c.manager}</td>
+          <td>${c.rc}</td>
+          <td>${c.wantsCession ? '<span class="pill" style="background:#06262b">Oui</span>' : '<span class="pill">Non</span>'}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn small ghost" onclick="editCompany('${c.id}')">Éditer</button>
+              <button class="btn small" onclick="deleteCompany('${c.id}')">Supprimer</button>
+              <button class="btn small" onclick="showCompanyDetails('${c.id}')">Détails</button>
+              <button class="btn small" onclick="downloadCompanySummary('${c.id}')">📄 RC</button>
+            </div>
+          </td>
+        `;
+        companiesTable.appendChild(tr);
+        
+        // Mobile card
+        const card = document.createElement('div');
+        card.className = 'mobile-company-card';
+        card.innerHTML = `
+          <div class="company-header">
+            <div class="company-name">${c.name}</div>
+            <div class="company-type">${getLegalTypeLabel(c.type)}</div>
+          </div>
+          <div class="company-details">
+            <div><strong>Gérant:</strong> ${c.manager}</div>
+            <div><strong>RC:</strong> ${c.rc}</div>
+            <div><strong>Cession:</strong> ${c.wantsCession ? 'Oui' : 'Non'}</div>
+          </div>
+          <div class="company-actions">
+            <button class="btn small ghost" onclick="editCompany('${c.id}')">Éditer</button>
+            <button class="btn small" onclick="deleteCompany('${c.id}')">Supprimer</button>
+            <button class="btn small" onclick="showCompanyDetails('${c.id}')">Détails</button>
+            <button class="btn small" onclick="downloadCompanySummary('${c.id}')">📄 RC</button>
+          </div>
+        `;
+        companiesMobileList.appendChild(card);
+      });
+    }
+
+    window.editCompany = function(id) {
+      editSociete(id); // Utiliser la nouvelle fonction
+    };
+
+    window.deleteCompany = function(id) {
+      deleteSociete(id); // Utiliser la nouvelle fonction
+    };
+
+    window.downloadCompanySummary = function(id) {
+      downloadRCSummary(id); // Utiliser la nouvelle fonction
+    };
+
+    window.showCompanyDetails = function(id) {
+      showSocieteDetails(id); // Utiliser la nouvelle fonction
+    };
+
+    window.generatePVPDF = function(id) {
+      downloadPV(id); // Utiliser la nouvelle fonction
+    };
+
+    function getLegalTypeLabel(code) {
+      const type = defaultLegalTypes.find(t => t.code === code);
+      return type ? type.label : code;
+    }
+
+    // Search
+    searchBtn.addEventListener('click', () => {
+      const query = searchText.value.toLowerCase();
+      const typeFilter = filterType.value;
+      const cessionFilter = filterCession.value;
+      
+      const currentCompanies = getCurrentCabinetCompanies();
+      const filtered = currentCompanies.filter(c => {
+        const matchesText = c.name.toLowerCase().includes(query) || 
+                           c.manager.toLowerCase().includes(query) || 
+                           c.rc.toLowerCase().includes(query);
+        const matchesType = !typeFilter || c.type === typeFilter;
+        const matchesCession = cessionFilter === 'all' || 
+                              (cessionFilter === 'yes' && c.wantsCession) || 
+                              (cessionFilter === 'no' && !c.wantsCession);
+        
+        return matchesText && matchesType && matchesCession;
+      });
+      
+      renderCompaniesTable(filtered);
+    });
+
+    clearSearchBtn.addEventListener('click', () => {
+      searchText.value = '';
+      filterType.value = '';
+      filterCession.value = 'all';
+      renderCompaniesTable(getCurrentCabinetCompanies());
+    });
+
+    // Reminders
+    function updateReminders() {
+      // Remove old reminders for current cabinet
+      reminders = reminders.filter(r => r.cabinetId !== currentCabinetId);
+      
+      // Add new reminders from current cabinet companies
+      const currentCompanies = getCurrentCabinetCompanies();
+      currentCompanies.forEach(c => {
+        if (c.wantsCession && c.cessionReminderDate) {
+          reminders.push({
+            id: genId(),
+            cabinetId: currentCabinetId,
+            companyId: c.id,
+            companyName: c.name,
+            date: c.cessionReminderDate,
+            type: 'cession',
+            message: `Rappel pour cession de parts - ${c.name}`
+          });
+        }
+      });
+      
+      save(LS_KEYS.REM, reminders);
+    }
+
+    function renderReminders() {
+      remindersList.innerHTML = '';
+      const currentReminders = getCurrentCabinetReminders();
+      
+      if (currentReminders.length === 0) {
+        remindersList.innerHTML = '<p class="muted">Aucun rappel</p>';
+        return;
+      }
+      
+      // Sort by date
+      const sortedReminders = [...currentReminders].sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      sortedReminders.forEach(r => {
+        const div = document.createElement('div');
+        div.style.padding = '10px';
+        div.style.borderBottom = '1px solid rgba(0,0,0,0.06)';
+        div.style.marginBottom = '8px';
+        
+        const date = new Date(r.date);
+        const today = new Date();
+        const diffTime = date - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        let statusClass = '';
+        let statusText = '';
+        
+        if (diffDays < 0) {
+          statusClass = 'danger';
+          statusText = 'En retard';
+        } else if (diffDays <= 7) {
+          statusClass = 'badge';
+          statusText = 'Bientôt';
+        } else {
+          statusText = 'Planifié';
+        }
+        
+        div.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+            <div style="flex:1">
+              <div style="font-weight:600;margin-bottom:4px">${r.companyName}</div>
+              <div class="small muted">${r.message}</div>
+              <div class="small">${r.date} (${diffDays} jours)</div>
+            </div>
+            <div class="badge ${statusClass}">${statusText}</div>
+          </div>
+        `;
+        
+        remindersList.appendChild(div);
+      });
+    }
+
+    function checkDueReminders() {
+      const currentReminders = getCurrentCabinetReminders();
+      const today = new Date();
+      const dueReminders = currentReminders.filter(r => {
+        const reminderDate = new Date(r.date);
+        const diffTime = reminderDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays <= 7 && diffDays >= 0;
+      });
+      
+      if (dueReminders.length > 0) {
+        reminderNotice.classList.remove('hidden');
+        reminderNotice.innerHTML = `
+          <strong>Rappels à venir :</strong> 
+          ${dueReminders.length} rappel(s) dans les 7 prochains jours
+        `;
+      } else {
+        reminderNotice.classList.add('hidden');
+      }
+    }
+
+    // Theme
+    themeSelect.addEventListener('change', (e) => {
+      setTheme(e.target.value);
+    });
+
+    function setTheme(newTheme) {
+      theme = newTheme;
+      document.body.setAttribute('data-theme', newTheme);
+      localStorage.setItem(LS_KEYS.THEME, newTheme);
+    }
+
+    // Export/Import
+    exportBtn.addEventListener('click', () => {
+      if (!currentCabinetId) {
+        alert('Veuillez sélectionner un cabinet d\'abord');
+        return;
+      }
+      
+      const currentCabinet = cabinets.find(c => c.id === currentCabinetId);
+      const data = {
+        cabinet: currentCabinet,
+        companies: getCurrentCabinetCompanies(),
+        templates: getCurrentCabinetTemplates(),
+        reminders: getCurrentCabinetReminders(),
+        cessions: getCurrentCabinetCessions(),
+        exportDate: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cabinet-${currentCabinet.name.replace(/\s+/g, '-')}-backup-${todayISO()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    importBtn.addEventListener('click', () => {
+      if (!currentCabinetId) {
+        alert('Veuillez sélectionner un cabinet d\'abord');
+        return;
+      }
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target.result);
+          
+          if (confirm(`Importer ${data.companies?.length || 0} sociétés, ${data.templates?.length || 0} modèles, ${data.cessions?.length || 0} cessions dans le cabinet actuel ?`)) {
+            // Import data with current cabinet ID
+            const importedCompanies = (data.companies || []).map(c => ({
+              ...c,
+              id: genId(), // Generate new IDs to avoid conflicts
+              cabinetId: currentCabinetId
+            }));
+            
+            const importedTemplates = (data.templates || []).map(t => ({
+              ...t,
+              id: genId(),
+              cabinetId: currentCabinetId
+            }));
+            
+            const importedCessions = (data.cessions || []).map(ces => ({
+              ...ces,
+              id: genId(),
+              cabinetId: currentCabinetId
+            }));
+            
+            // Add imported data to existing data
+            companies = [...companies, ...importedCompanies];
+            templates = [...templates, ...importedTemplates];
+            cessions = [...cessions, ...importedCessions];
+            
+            saveAll();
+            initUI();
+            alert('Données importées avec succès !');
+          }
+        } catch (error) {
+          alert('Erreur : Fichier JSON invalide');
+          console.error('Import error:', error);
+        }
+      };
+      reader.readAsText(file);
+      fileInput.value = '';
+    });
+
+    // Save all data
+    function saveAll() {
+      save(LS_KEYS.ADMIN, admin);
+      save(LS_KEYS.COMP, companies);
+      save(LS_KEYS.TPL, templates);
+      save(LS_KEYS.REM, reminders);
+      save(LS_KEYS.CESSIONS, cessions);
+      save(LS_KEYS.CABINETS, cabinets);
+    }
+
+    // Initialize
+    initUI();
+  </script>
+
+  </main>
+</div>
+
+<script>
+/* Sidebar interactions and integration with existing app sections */
+(function(){
+  const splash = document.getElementById('splash');
+  // hide splash after 1.2s
+  setTimeout(()=>{ if(splash){ splash.classList.add('splash-hidden'); setTimeout(()=>splash.remove(),700); } }, 1200);
+
+  // Menu links
+  const menu = document.getElementById('mainMenu');
+  const links = menu.querySelectorAll('a[data-target]');
+  function clearActive(){ links.forEach(l=>l.classList.remove('active')); }
+  links.forEach(link=>{
+    link.addEventListener('click', (e)=>{
+      e.preventDefault();
+      clearActive();
+      link.classList.add('active');
+      const t = link.dataset.target;
+      // Hide all app cards
+      document.querySelectorAll('#app > .card').forEach(c=>c.classList.add('hidden'));
+      // Show corresponding section
+      let targetEl = null;
+      if(t === 'dashboard') targetEl = document.getElementById('dashboard');
+      else if(t === 'cabinet') targetEl = Array.from(document.querySelectorAll('#app .card')).find(c=>/Gestion des Cabinets/i.test(c.innerText));
+      else if(t === 'societes') targetEl = document.getElementById('societesSection');
+      else if(t === 'modeles') targetEl = document.getElementById('templatesCard');
+      else if(t === 'cessions') targetEl = document.getElementById('cessionsCard');
+      else if(t === 'rappels') targetEl = Array.from(document.querySelectorAll('#app .card')).find(c=>/Rappels/i.test(c.innerText));
+      else if(t === 'parametres') { alert('Paramètres bientôt disponibles'); return; }
+      if(targetEl) targetEl.classList.remove('hidden');
+      // On small screens, scroll to top of content
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+
+  // Theme toggle
+  const themeToggle = document.getElementById('themeToggle');
+  themeToggle.addEventListener('click', ()=>{
+    const body = document.body;
+    const isDark = body.getAttribute('data-theme') === 'dark';
+    if(isDark){
+      body.setAttribute('data-theme','light');
+      themeToggle.textContent = 'Mode sombre';
+      localStorage.setItem('cabinet_theme','light');
+    } else {
+      body.setAttribute('data-theme','dark');
+      themeToggle.textContent = 'Mode clair';
+      localStorage.setItem('cabinet_theme','dark');
+    }
+  });
+
+  // Logout from sidebar
+  const logoutSidebar = document.getElementById('logoutSidebar');
+  logoutSidebar.addEventListener('click', ()=>{
+    // show login section
+    document.getElementById('app').classList.add('hidden');
+    document.getElementById('loginSection').classList.remove('hidden');
+    // activate dashboard menu default
+    clearActive();
+    menu.querySelector('a[data-target="dashboard"]').classList.add('active');
+  });
+
+  // Hook: when login button is clicked in original app, show dashboard and keep sidebar active
+  const loginBtn = document.getElementById('loginBtn');
+  if(loginBtn){
+    loginBtn.addEventListener('click', ()=>{
+      // let original handler run (it hides login and shows app)
+      setTimeout(()=> {
+        // show dashboard by triggering click on dashboard link
+        const dashLink = menu.querySelector('a[data-target="dashboard"]');
+        if(dashLink) dashLink.click();
+      }, 100);
+    });
+  }
+})();
+</script>
+
+
+<!-- START: Cessions -> Générer PV et Statuts modifiés -->
+<script>
+(function(){
+  // ensure arrays exist in local scope used by app; if not, try to parse from localStorage
+  try {
+    window.cessions = window.cessions || JSON.parse(localStorage.getItem('cabinet_cessions')||'[]');
+    window.companies = window.companies || JSON.parse(localStorage.getItem('cabinet_companies')||'[]');
+  } catch(e){ window.cessions = window.cessions || []; window.companies = window.companies || []; }
+
+  // Utility to get company by id or name
+  function findCompanyByNameOrId(key){
+    if(!key) return null;
+    // try id first
+    let c = window.companies.find(x=>x.id===key);
+    if(c) return c;
+    // else search by name (case-insensitive)
+    return window.companies.find(x=>x.name && x.name.toLowerCase().includes(String(key).toLowerCase()));
+  }
+
+  // Save cession handler (if app's save exists, it will also run)
+  const saveCessionBtn = document.getElementById('saveCessionBtn');
+  if(saveCessionBtn){
+    saveCessionBtn.addEventListener('click', function(){
+      // Read fields
+      const companyIdOrName = (document.getElementById('cessionCompany') && document.getElementById('cessionCompany').value) || '';
+      const company = findCompanyByNameOrId(companyIdOrName) || { name: companyIdOrName || 'Société' };
+      const date = (document.getElementById('cessionDate') && document.getElementById('cessionDate').value) || new Date().toISOString().slice(0,10);
+      const cedant = (document.getElementById('cessionCedant') && document.getElementById('cessionCedant').value) || '';
+      const cedantAddress = (document.getElementById('cessionCedantAddress') && document.getElementById('cessionCedantAddress').value) || '';
+      const cessionnaire = (document.getElementById('cessionCessionnaire') && document.getElementById('cessionCessionnaire').value) || '';
+      const cessionnaireAddress = (document.getElementById('cessionCessionnaireAddress') && document.getElementById('cessionCessionnaireAddress').value) || '';
+      const parts = parseFloat(document.getElementById('cessionPartsCount')?.value || 0);
+      const price = parseFloat(document.getElementById('cessionPrice')?.value || 0);
+      const payment = document.getElementById('cessionPaymentMode')?.value || '';
+      const conditions = document.getElementById('cessionConditions')?.value || '';
+      const id = 'ces_' + Math.random().toString(36).slice(2,9);
+
+      const newCession = {
+        id, companyId: company.id || '', companyName: company.name || companyIdOrName,
+        date, cedant, cedantAddress, cessionnaire, cessionnaireAddress, parts, price, payment, conditions, created: new Date().toISOString()
+      };
+
+      // push and save to localStorage
+      window.cessions = window.cessions || [];
+      window.cessions.push(newCession);
+      localStorage.setItem('cabinet_cessions', JSON.stringify(window.cessions));
+
+      // also update global app cessions if it exists
+      if(typeof cessions !== 'undefined'){ cessions.push(newCession); try{ localStorage.setItem('cabinet_cessions', JSON.stringify(cessions)); }catch(e){} }
+
+      // store last generated id to be used by generate button
+      localStorage.setItem('last_cession_id', id);
+
+      alert('Cession enregistrée. Tu peux maintenant générer le modèle Statuts modifiés & PV.');
+      // reveal generate button area if hidden
+      const genBtn = document.getElementById('generateCessionDocBtn');
+      if(genBtn) genBtn.classList.remove('hidden');
+    });
+  }
+
+  // Generate document function
+  function buildCessionDocuments(cession){
+    // find company and compute new capital repartition when possible
+    const company = findCompanyByNameOrId(cession.companyId) || { name: cession.companyName || 'Société', capital: 0, shareValue: 100, associates: [] };
+    const capital = parseFloat(company.capital) || 0;
+    const shareValue = parseFloat(company.shareValue) || 100;
+    const totalShares = shareValue>0 ? Math.round(capital / shareValue) : 0;
+
+    // Compute new shares for cessionnaire (simple addition) - we don't know which associate was ceded, so we will present the cession as transfer of parts from cedant to cessionnaire
+    // Build updated associates list by trying to find cedant by name in company.associates
+    const associates = Array.isArray(company.associates) ? JSON.parse(JSON.stringify(company.associates)) : [];
+    // find cedant in associates (by name)
+    let cedantAssoc = associates.find(a=>a.name && a.name.toLowerCase().includes(cession.cedant.toLowerCase()));
+    if(cedantAssoc){
+      cedantAssoc.shares = (cedantAssoc.shares || 0) - (cession.parts || 0);
+      cedantAssoc.amount = (cedantAssoc.shares || 0) * shareValue;
+    }
+    // find cessionnaire as existing associate
+    let cessionnaireAssoc = associates.find(a=>a.name && a.name.toLowerCase().includes(cession.cessionnaire.toLowerCase()));
+    if(cessionnaireAssoc){
+      cessionnaireAssoc.shares = (cessionnaireAssoc.shares || 0) + (cession.parts || 0);
+      cessionnaireAssoc.amount = cessionnaireAssoc.shares * shareValue;
+    } else {
+      // create new associate entry
+      cessionnaireAssoc = { id: 'a_'+Math.random().toString(36).slice(2,8), name: cession.cessionnaire, nationality: 'non renseignée', percentage: 0, shares: (cession.parts || 0), amount: (cession.parts||0)*shareValue };
+      associates.push(cessionnaireAssoc);
+    }
+
+    // Recalculate percentages
+    const updatedTotalShares = associates.reduce((s,a)=>s + (parseFloat(a.shares)||0), 0) || totalShares;
+    associates.forEach(a=>{ a.percentage = updatedTotalShares>0 ? ((a.shares||0)/updatedTotalShares*100).toFixed(2) : '0.00'; });
+
+    // Build Statuts modifiés HTML
+    const statutsHTML = `
+      <div style="font-family: Poppins, Inter, sans-serif; padding:20px; max-width:800px; margin:0 auto; color:#0b1220;">
+        <h2 style="text-align:center">STATUTS MODIFIÉS - Comptabilité</h2>
+        <p><strong>Société :</strong> ${company.name}</p>
+        <p><strong>Date de la cession :</strong> ${cession.date}</p>
+        <p><strong>Nature de la modification :</strong> Cession de parts sociales entre <strong>${cession.cedant}</strong> et <strong>${cession.cessionnaire}</strong></p>
+        <h3>Nouvelle répartition du capital social</h3>
+        <table style="width:100%; border-collapse:collapse; margin-top:8px;">
+          <thead><tr><th style="text-align:left;padding:6px;border-bottom:1px solid #e6eef0">Associé</th><th style="text-align:right;padding:6px;border-bottom:1px solid #e6eef0">Parts</th><th style="text-align:right;padding:6px;border-bottom:1px solid #e6eef0">Pourcentage</th></tr></thead>
+          <tbody>
+            ${associates.map(a=>`<tr><td style="padding:6px;border-bottom:1px solid #f2f6f7">${a.name}</td><td style="padding:6px;border-bottom:1px solid #f2f6f7;text-align:right">${a.shares}</td><td style="padding:6px;border-bottom:1px solid #f2f6f7;text-align:right">${a.percentage}%</td></tr>`).join('')}
+          </tbody>
+        </table>
+        <p style="margin-top:12px">Capital social : <strong>${capital} DH</strong> — Valeur part : <strong>${shareValue} DH</strong></p>
+        <p style="margin-top:20px">Conditions & Observations : ${cession.conditions || 'Aucune'}</p>
+      </div>
+    `;
+
+    // Build PV HTML
+    const pvHTML = `
+      <div style="font-family: Poppins, Inter, sans-serif; padding:20px; max-width:800px; margin:0 auto; color:#0b1220;">
+        <h2 style="text-align:center">PROCÈS-VERBAL DE L'ASSEMBLÉE GÉNÉRALE EXTRAORDINAIRE</h2>
+        <p><strong>Société :</strong> ${company.name}</p>
+        <p><strong>Date :</strong> ${cession.date}</p>
+        <p><strong>Ordre du jour :</strong> Approbation de la cession de parts sociales entre <strong>${cession.cedant}</strong> (cédant) et <strong>${cession.cessionnaire}</strong> (cessionnaire).</p>
+        <h3>Décisions</h3>
+        <ol>
+          <li>Constatation de la cession de <strong>${cession.parts}</strong> parts, au prix de <strong>${cession.price} DH</strong>.</li>
+          <li>Modification des statuts en conséquence et mise à jour de la répartition du capital social.</li>
+          <li>Pouvoirs sont donnés au gérant pour effectuer les formalités nécessaires.</li>
+        </ol>
+        <p style="margin-top:20px">Fait à ________, le ${cession.date}</p>
+        <p style="margin-top:12px">Le(s) associés : ______________________</p>
+      </div>
+    `;
+
+    return { statutsHTML, pvHTML };
+  }
+
+  // Function to show modal with generated documents and allow export
+  function showGeneratedModal(htmlContent){
+    // create overlay
+    let overlay = document.getElementById('cessionDocOverlay');
+    if(overlay) overlay.remove();
+    overlay = document.createElement('div');
+    overlay.id = 'cessionDocOverlay';
+    overlay.style.position = 'fixed';
+    overlay.style.left = '0';
+    overlay.style.top = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.background = 'rgba(0,0,0,0.6)';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = 99999;
+
+    const box = document.createElement('div');
+    box.style.width = '92%';
+    box.style.maxWidth = '980px';
+    box.style.maxHeight = '90%';
+    box.style.overflow = 'auto';
+    box.style.background = '#fff';
+    box.style.borderRadius = '10px';
+    box.style.padding = '16px';
+    box.style.boxShadow = '0 20px 60px rgba(2,6,23,0.3)';
+
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.justifyContent = 'space-between';
+    header.style.alignItems = 'center';
+    header.style.marginBottom = '10px';
+
+    const title = document.createElement('div');
+    title.innerHTML = '<strong>Comptabilité - Statuts modifiés & PV</strong>';
+    const actions = document.createElement('div');
+    const btnPdf = document.createElement('button');
+    btnPdf.className = 'btn';
+    btnPdf.textContent = 'Télécharger PDF';
+    btnPdf.style.marginRight = '8px';
+    const btnClose = document.createElement('button');
+    btnClose.className = 'btn ghost';
+    btnClose.textContent = 'Fermer';
+
+    actions.appendChild(btnPdf);
+    actions.appendChild(btnClose);
+    header.appendChild(title);
+    header.appendChild(actions);
+
+    const content = document.createElement('div');
+    content.id = 'cessionDocContent';
+    content.innerHTML = htmlContent;
+
+    box.appendChild(header);
+    box.appendChild(content);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    // pdf export using html2pdf if available
+    btnPdf.addEventListener('click', function(){
+      if(window.html2pdf){
+        // prepare combined doc
+        const el = document.createElement('div');
+        el.innerHTML = content.innerHTML;
+        const opt = { margin:10, filename: 'Comptabilite_Statuts_Modifies_'+(new Date().toISOString().slice(0,10))+'.pdf', image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} };
+        html2pdf().set(opt).from(el).save();
+      } else {
+        alert('html2pdf non disponible. Tu peux copier le contenu et l\'imprimer manuellement.');
+      }
+    });
+
+    btnClose.addEventListener('click', function(){ overlay.remove(); });
+  }
+
+  // Handler for generate button
+  const genBtn = document.getElementById('generateCessionDocBtn');
+  if(genBtn){
+    genBtn.addEventListener('click', function(){
+      // find last saved cession id
+      const lastId = localStorage.getItem('last_cession_id') || (window.cessions && window.cessions.length ? window.cessions[window.cessions.length-1].id : null);
+      const cession = (window.cessions || []).find(c=>c.id===lastId) || (window.cessions && window.cessions[window.cessions.length-1]) || null;
+      if(!cession){
+        alert('Aucune cession trouvée. Enregistre d\'abord la cession.');
+        return;
+      }
+      const docs = buildCessionDocuments(cession);
+      const combinedHTML = `<div>${docs.statutsHTML}</div><hr style="margin:18px 0;border:none;border-top:1px solid #e6eef0"/><div>${docs.pvHTML}</div>`;
+      showGeneratedModal(combinedHTML);
+    });
+  }
+
+})(); 
+</script>
+<!-- END: Cessions -> Générer PV et Statuts modifiés -->
+
+</body>
+</html>
