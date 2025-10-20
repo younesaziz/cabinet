@@ -550,6 +550,13 @@ body{font-family:Inter,'Poppins',system-ui,Segoe UI,Roboto,Arial;background:var(
       <a href="#" data-target="societes"><span class="ico">🏛️</span><span class="label">Sociétés</span></a>
       <a href="#" data-target="modeles"><span class="ico">📄</span><span class="label">Modèles</span></a>
       <a href="#" data-target="cessions"><span class="ico">🔁</span><span class="label">Cessions</span></a>
+      <a href="#" data-target="journaux"><span class="ico">📘</span><span class="label">Journaux</span></a>
+      <a href="#" data-target="ecritures"><span class="ico">🧾</span><span class="label">Écritures</span></a>
+      <a href="#" data-target="pcm"><span class="ico">📚</span><span class="label">Plan comptable</span></a>
+      <a href="#" data-target="etats"><span class="ico">📊</span><span class="label">États</span></a>
+      <a href="#" data-target="tva"><span class="ico">🧮</span><span class="label">TVA</span></a>
+      <a href="#" data-target="paie"><span class="ico">👥</span><span class="label">Paie</span></a>
+      <a href="#" data-target="facturation"><span class="ico">🧾</span><span class="label">Facturation</span></a>
       <a href="#" data-target="rappels"><span class="ico">⏰</span><span class="label">Rappels</span></a>
       <a href="#" data-target="parametres"><span class="ico">⚙️</span><span class="label">Paramètres</span></a>
     </nav>
@@ -1132,6 +1139,163 @@ body{font-family:Inter,'Poppins',system-ui,Segoe UI,Roboto,Arial;background:var(
         <div id="remindersList"></div>
       </div>
 
+      <!-- Journaux comptables -->
+      <div id="journauxSection" class="card hidden">
+        <h3>Journaux comptables</h3>
+        <div class="form-grid cols-2">
+          <div>
+            <label>Type de journal</label>
+            <select id="journalType">
+              <option value="ACHATS">Journal des achats</option>
+              <option value="VENTES">Journal des ventes</option>
+              <option value="TRESORERIE">Journal de trésorerie</option>
+              <option value="OD">Opérations diverses</option>
+            </select>
+          </div>
+          <div>
+            <label>Période</label>
+            <input id="journalPeriod" placeholder="YYYY-MM" />
+          </div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px">
+          <button id="addJournalEntryBtn" class="btn">Ajouter écriture</button>
+          <button id="exportJournalExcelBtn" class="btn ghost">Export Excel</button>
+          <button id="exportJournalPdfBtn" class="btn ghost">Export PDF</button>
+        </div>
+        <div class="table-container" style="margin-top:10px">
+          <table class="transactions-table" id="journalTable">
+            <thead>
+              <tr>
+                <th>N°</th><th>Date</th><th>Pièce</th><th>Libellé</th><th>Compte Débit</th><th>Compte Crédit</th><th>Montant</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Plan Comptable Marocain -->
+      <div id="pcmSection" class="card hidden">
+        <h3>Plan Comptable Marocain (PCM)</h3>
+        <p class="small muted">Classes 1 à 8. Saisie assistée via liste déroulante.</p>
+        <div id="pcmList" class="list" style="max-height:320px"></div>
+      </div>
+
+      <!-- Écritures comptables -->
+      <div id="ecrituresSection" class="card hidden">
+        <h3>Écritures comptables</h3>
+        <div class="form-grid cols-2">
+          <div>
+            <label>Date</label>
+            <input id="ecritureDate" type="date" />
+          </div>
+          <div>
+            <label>Libellé</label>
+            <input id="ecritureLibelle" placeholder="Description de l'opération" />
+          </div>
+          <div>
+            <label>Compte Débit</label>
+            <input id="ecritureDebit" list="pcmAccounts" placeholder="Ex: 3451" />
+          </div>
+          <div>
+            <label>Compte Crédit</label>
+            <input id="ecritureCredit" list="pcmAccounts" placeholder="Ex: 7111" />
+          </div>
+          <div>
+            <label>Montant</label>
+            <input id="ecritureMontant" type="number" step="0.01" />
+          </div>
+          <div>
+            <label>Référence pièce</label>
+            <input id="ecritureRef" placeholder="N° facture / pièce" />
+          </div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px">
+          <button id="saveEcritureBtn" class="btn">Enregistrer</button>
+          <button id="clearEcritureBtn" class="btn ghost">Effacer</button>
+        </div>
+        <datalist id="pcmAccounts"></datalist>
+        <div class="table-container" style="margin-top:10px">
+          <table class="transactions-table" id="ecrituresTable">
+            <thead><tr><th>N°</th><th>Date</th><th>Libellé</th><th>Débit</th><th>Crédit</th><th>Montant</th><th>Pièce</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- États financiers -->
+      <div id="etatsSection" class="card hidden">
+        <h3>États financiers</h3>
+        <div class="grid-2">
+          <div class="chart-card"><h4 style="margin:0">Bilan</h4><div class="chart-placeholder">Bilan (auto)</div></div>
+          <div class="chart-card"><h4 style="margin:0">Compte de résultat</h4><div class="chart-placeholder">CR (auto)</div></div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px">
+          <button id="exportBalanceExcelBtn" class="btn ghost">Balance Excel</button>
+          <button id="exportGrandLivrePdfBtn" class="btn ghost">Grand livre PDF</button>
+        </div>
+      </div>
+
+      <!-- TVA -->
+      <div id="tvaSection" class="card hidden">
+        <h3>Gestion TVA</h3>
+        <div class="form-grid cols-2">
+          <div>
+            <label>Période</label>
+            <input id="tvaPeriod" placeholder="YYYY-MM" />
+          </div>
+          <div>
+            <label>Périodicité</label>
+            <select id="tvaFrequency"><option value="M">Mensuelle</option><option value="T">Trimestrielle</option></select>
+          </div>
+          <div>
+            <label>TVA collectée (ventes)</label>
+            <input id="tvaOutput" type="number" step="0.01" />
+          </div>
+          <div>
+            <label>TVA déductible (achats)</label>
+            <input id="tvaInput" type="number" step="0.01" />
+          </div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px">
+          <button id="calcTvaBtn" class="btn">Calculer</button>
+          <button id="exportTvaPdfBtn" class="btn ghost">Export déclaration</button>
+        </div>
+        <div id="tvaResult" class="notice" style="margin-top:10px"></div>
+      </div>
+
+      <!-- Paie (optionnel) -->
+      <div id="paieSection" class="card hidden">
+        <h3>Paie & CNSS (optionnel)</h3>
+        <div class="form-grid cols-2">
+          <div><label>Employé</label><input id="paieEmployee" placeholder="Nom complet" /></div>
+          <div><label>Salaire brut</label><input id="paieBrut" type="number" step="0.01" /></div>
+          <div><label>CNSS</label><input id="paieCnss" type="number" step="0.01" /></div>
+          <div><label>AMO</label><input id="paieAmo" type="number" step="0.01" /></div>
+          <div><label>IR</label><input id="paieIr" type="number" step="0.01" /></div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px"><button id="calcPaieBtn" class="btn">Calculer net</button></div>
+        <div id="paieResult" class="notice" style="margin-top:10px"></div>
+      </div>
+
+      <!-- Facturation -->
+      <div id="facturationSection" class="card hidden">
+        <h3>Facturation</h3>
+        <div class="form-grid cols-2">
+          <div><label>Client</label><input id="factClient" placeholder="Nom du client" /></div>
+          <div><label>Date</label><input id="factDate" type="date" /></div>
+          <div><label>Objet</label><input id="factObjet" placeholder="Objet du devis/facture" /></div>
+          <div><label>Montant HT</label><input id="factMontantHT" type="number" step="0.01" /></div>
+          <div><label>TVA (%)</label><input id="factTVA" type="number" value="20" step="0.01" /></div>
+          <div><label>Timbre fiscal</label><input id="factTimbre" type="number" value="0.6" step="0.01" /></div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px">
+          <button id="genDevisBtn" class="btn">Créer devis</button>
+          <button id="genFactureBtn" class="btn ghost">Créer facture</button>
+          <button id="printFactureBtn" class="btn ghost">Imprimer PDF</button>
+        </div>
+        <div id="facturePreview" class="notice" style="margin-top:10px"></div>
+      </div>
     </div>
 
     <div style="margin-top:20px;text-align:center;color:var(--muted);font-size:12px;padding:0 10px">
