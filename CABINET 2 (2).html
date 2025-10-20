@@ -570,7 +570,7 @@ body{font-family:Inter,'Poppins',system-ui,Segoe UI,Roboto,Arial;background:var(
   <main class="content-wrap">
     <!-- The original container will follow here -->
 
-  <div class="container" id="printable">
+  <div class="container">
     <header>
       <div class="header-top">
         <h1 id="mainTitle">FinOps Cabinet</h1>
@@ -3912,6 +3912,238 @@ LES ASSOCIÉS FONDATEURS :
       localStorage.setItem(LS_KEYS.THEME, newTheme);
     }
 
+    /* ==============================
+       Comptabilité avancée (Journaux, PCM, Écritures, États, TVA, Paie, Facturation)
+       ============================== */
+
+    // --- PCM (Plan Comptable Marocain) - échantillon classes 1–8 ---
+    const pcmAccountsData = [
+      {code:'1', label:'Comptes de capitaux'},
+      {code:'11', label:'Capital et réserves'},
+      {code:'2', label:'Immobilisations'},
+      {code:'3', label:'Stocks et en-cours'},
+      {code:'4', label:'Comptes de tiers'},
+      {code:'3451', label:'TVA récupérable sur immobilisations'},
+      {code:'3455', label:'TVA récupérable sur biens et services'},
+      {code:'3456', label:"TVA récupérable sur achats à l'import"},
+      {code:'5', label:'Trésorerie'},
+      {code:'5111', label:'Banque'},
+      {code:'5113', label:'Caisse'},
+      {code:'6', label:'Charges'},
+      {code:'6111', label:'Achats de marchandises'},
+      {code:'6131', label:'Sous-traitance générale'},
+      {code:'7', label:'Produits'},
+      {code:'7111', label:'Ventes de marchandises'},
+      {code:'7121', label:'Prestations de services'},
+      {code:'8', label:'Comptes spéciaux'}
+    ];
+
+    function populatePcmDatalist(){
+      const dl = document.getElementById('pcmAccounts');
+      if(dl){
+        dl.innerHTML = '';
+        pcmAccountsData.forEach(acc=>{
+          const opt = document.createElement('option');
+          opt.value = acc.code;
+          opt.label = `${acc.code} - ${acc.label}`;
+          dl.appendChild(opt);
+        });
+      }
+      const pcmList = document.getElementById('pcmList');
+      if(pcmList){
+        pcmList.innerHTML = pcmAccountsData.map(a=>`<div class="small">${a.code} - ${a.label}</div>`).join('');
+      }
+    }
+
+    // --- Stockage (localStorage) ---
+    let journalEntries = load('cabinet_journal_entries', []); // {cabinetId,type,period,no,date,piece,libelle,debit,credit,montant}
+    let ecritures = load('cabinet_ecritures', []); // {cabinetId,date,libelle,debit,credit,montant,ref}
+    let invoiceSeqMap = load('cabinet_invoice_seq_map', {}); // { [cabinetId]: {year: number, devis: n, facture: n} }
+
+    // --- Helpers ---
+    function journalPrefix(type){
+      const map = { ACHATS:'ACH', VENTES:'VEN', TRESORERIE:'TRE', OD:'OD' };
+      return map[type] || 'JR';
+    }
+    function normPeriod(p){ return String(p||todayISO().slice(0,7)).replace(/-/g,''); }
+
+    function nextJournalNumber(type, period){
+      const prefix = journalPrefix(type);
+      const per = normPeriod(period);
+      const rows = journalEntries.filter(j=> j.cabinetId===currentCabinetId && j.type===type && j.period===per);
+      const n = rows.length + 1;
+      return `${prefix}-${per}-${String(n).padStart(5,'0')}`;
+    }
+
+    function renderJournal(){
+      const tbody = document.querySelector('#journalTable tbody');
+      if(!tbody) return;
+      const typeEl = document.getElementById('journalType');
+      const perEl = document.getElementById('journalPeriod');
+      const type = typeEl ? typeEl.value : 'ACHATS';
+      const period = normPeriod(perEl ? perEl.value : '');
+      const rows = journalEntries.filter(j=> j.cabinetId===currentCabinetId && j.type===type && (!period || j.period===period));
+      tbody.innerHTML = rows.map(r=>`<tr>
+        <td>${r.no}</td><td>${formatDateISO(r.date)}</td><td>${r.piece||'—'}</td><td>${r.libelle||''}</td>
+        <td>${r.debit}</td><td>${r.credit}</td><td>${formatCurrency(r.montant||0)}</td>
+      </tr>`).join('');
+    }
+
+    function renderEcritures(){
+      const tbody = document.querySelector('#ecrituresTable tbody');
+      if(!tbody) return;
+      const rows = ecritures.filter(e=> e.cabinetId===currentCabinetId);
+      tbody.innerHTML = rows.map((e,i)=>`<tr>
+        <td>${String(i+1).padStart(4,'0')}</td><td>${formatDateISO(e.date)}</td><td>${e.libelle||''}</td>
+        <td>${e.debit}</td><td>${e.credit}</td><td>${formatCurrency(e.montant||0)}</td><td>${e.ref||'—'}</td>
+      </tr>`).join('');
+    }
+
+    function exportTableToExcel(tableId, filename){
+      const table = document.getElementById(tableId);
+      if(!table) return;
+      const html = table.outerHTML;
+      const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename.endsWith('.xls')? filename : `${filename}.xls`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+
+    function exportContainerToPdf(containerSelector, filename){
+      const printable = document.getElementById('printable');
+      if(!printable) return;
+      const src = document.querySelector(containerSelector);
+      if(!src || !window.html2pdf) return;
+      printable.innerHTML = src.outerHTML;
+      const opt = { margin:10, filename: filename.endsWith('.pdf')? filename : `${filename}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} };
+      html2pdf().from(printable).set(opt).save();
+      setTimeout(()=>{ printable.innerHTML=''; }, 400);
+    }
+
+    function computeTrialBalance(){
+      const rows = ecritures.filter(e=> e.cabinetId===currentCabinetId);
+      const byAcc = new Map();
+      rows.forEach(e=>{
+        const debitAcc = e.debit; const creditAcc = e.credit; const amt = Number(e.montant||0);
+        if(debitAcc){ const s = byAcc.get(debitAcc)||{debit:0,credit:0}; s.debit+=amt; byAcc.set(debitAcc,s); }
+        if(creditAcc){ const s = byAcc.get(creditAcc)||{debit:0,credit:0}; s.credit+=amt; byAcc.set(creditAcc,s); }
+      });
+      return Array.from(byAcc.entries()).map(([acc,tot])=>({account:acc, debit:tot.debit, credit:tot.credit}));
+    }
+
+    function exportBalanceExcel(){
+      const data = computeTrialBalance();
+      const table = document.createElement('table');
+      table.className = 'transactions-table';
+      table.innerHTML = '<thead><tr><th>Compte</th><th>Débit</th><th>Crédit</th></tr></thead>' +
+        '<tbody>' + data.map(r=>`<tr><td>${r.account}</td><td>${r.debit}</td><td>${r.credit}</td></tr>`).join('') + '</tbody>';
+      table.style.display='none';
+      document.body.appendChild(table);
+      exportTableToExcel(table.id || 'tmpBalance', 'balance-generale');
+      document.body.removeChild(table);
+    }
+
+    function exportGrandLivrePdf(){
+      const rows = ecritures.filter(e=> e.cabinetId===currentCabinetId);
+      const byAcc = new Map();
+      rows.forEach(e=>{ const arr = byAcc.get(e.debit)||[]; arr.push({date:e.date, libelle:e.libelle, debit:e.montant, credit:0}); byAcc.set(e.debit, arr); });
+      rows.forEach(e=>{ const arr = byAcc.get(e.credit)||[]; arr.push({date:e.date, libelle:e.libelle, debit:0, credit:e.montant}); byAcc.set(e.credit, arr); });
+      const html = Array.from(byAcc.entries()).map(([acc, lines])=>{
+        const body = lines.sort((a,b)=> new Date(a.date)-new Date(b.date)).map(l=>`<tr><td>${formatDateISO(l.date)}</td><td>${l.libelle||''}</td><td style="text-align:right">${formatCurrency(l.debit)}</td><td style="text-align:right">${formatCurrency(l.credit)}</td></tr>`).join('');
+        return `<h4>Compte ${acc}</h4><table class="transactions-table"><thead><tr><th>Date</th><th>Libellé</th><th>Débit</th><th>Crédit</th></tr></thead><tbody>${body}</tbody></table>`;
+      }).join('<hr/>');
+      const printable = document.getElementById('printable');
+      if(!printable || !window.html2pdf) return;
+      printable.innerHTML = `<div style="padding:12px">${html}</div>`;
+      const opt = { margin:10, filename: 'grand-livre.pdf', image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} };
+      html2pdf().from(printable).set(opt).save();
+      setTimeout(()=>{ printable.innerHTML=''; }, 400);
+    }
+
+    function nextDocNumber(kind){
+      const y = new Date().getFullYear();
+      if(!invoiceSeqMap[currentCabinetId]) invoiceSeqMap[currentCabinetId] = {year:y, devis:0, facture:0};
+      const rec = invoiceSeqMap[currentCabinetId];
+      if(rec.year !== y){ rec.year = y; rec.devis = 0; rec.facture = 0; }
+      rec[kind] += 1; save('cabinet_invoice_seq_map', invoiceSeqMap);
+      return `${kind==='devis'?'DEV':'FAC'}-${y}-${String(rec[kind]).padStart(4,'0')}`;
+    }
+
+    // --- Events wiring ---
+    document.addEventListener('change', (e)=>{
+      const t = e.target;
+      if(!t) return;
+      if(t.id==='journalType' || t.id==='journalPeriod') renderJournal();
+    });
+
+    document.addEventListener('click', (e)=>{
+      const t = e.target;
+      if(!t) return;
+      if(t.id==='addJournalEntryBtn'){
+        if(!currentCabinetId){ alert('Sélectionnez un cabinet'); return; }
+        const type = document.getElementById('journalType').value;
+        const per = normPeriod(document.getElementById('journalPeriod').value);
+        const no = nextJournalNumber(type, per);
+        const item = { cabinetId: currentCabinetId, type, period: per, no, date: todayISO(), piece:'', libelle:'Nouvelle écriture', debit:'', credit:'', montant:0 };
+        journalEntries.push(item); save('cabinet_journal_entries', journalEntries); renderJournal();
+      }
+      if(t.id==='exportJournalExcelBtn') exportTableToExcel('journalTable', 'journal');
+      if(t.id==='exportJournalPdfBtn') exportContainerToPdf('#journauxSection', 'journal');
+      if(t.id==='saveEcritureBtn'){
+        if(!currentCabinetId){ alert('Sélectionnez un cabinet'); return; }
+        const obj = {
+          cabinetId: currentCabinetId,
+          date: document.getElementById('ecritureDate').value || todayISO(),
+          libelle: document.getElementById('ecritureLibelle').value || '',
+          debit: document.getElementById('ecritureDebit').value || '',
+          credit: document.getElementById('ecritureCredit').value || '',
+          montant: parseFloat(document.getElementById('ecritureMontant').value)||0,
+          ref: document.getElementById('ecritureRef').value || ''
+        };
+        if(!obj.debit || !obj.credit || !obj.montant){ alert('Débit, Crédit et Montant sont requis'); return; }
+        ecritures.push(obj); save('cabinet_ecritures', ecritures); renderEcritures();
+      }
+      if(t.id==='clearEcritureBtn'){
+        ['ecritureLibelle','ecritureDebit','ecritureCredit','ecritureMontant','ecritureRef'].forEach(id=>{ const el = document.getElementById(id); if(el) el.value=''; });
+      }
+      if(t.id==='exportBalanceExcelBtn') exportBalanceExcel();
+      if(t.id==='exportGrandLivrePdfBtn') exportGrandLivrePdf();
+      if(t.id==='calcTvaBtn'){
+        const out = parseFloat(document.getElementById('tvaOutput').value)||0;
+        const inp = parseFloat(document.getElementById('tvaInput').value)||0;
+        const due = Math.max(out - inp, 0);
+        const box = document.getElementById('tvaResult'); if(box) box.innerHTML = `<strong>TVA à payer:</strong> ${formatCurrency(due)} (Période ${document.getElementById('tvaPeriod').value||''})`;
+      }
+      if(t.id==='exportTvaPdfBtn') exportContainerToPdf('#tvaSection', 'declaration_tva');
+      if(t.id==='genDevisBtn' || t.id==='genFactureBtn' || t.id==='printFactureBtn'){
+        const client = document.getElementById('factClient').value||'Client';
+        const date = document.getElementById('factDate').value||todayISO();
+        const objet = document.getElementById('factObjet').value||'Prestations';
+        const ht = parseFloat(document.getElementById('factMontantHT').value)||0;
+        const tvaPct = parseFloat(document.getElementById('factTVA').value)||0;
+        const timbre = parseFloat(document.getElementById('factTimbre').value)||0.6;
+        const tva = ht * (tvaPct/100);
+        const ttc = ht + tva + timbre;
+        const kind = t.id==='genDevisBtn' ? 'devis' : 'facture';
+        const num = nextDocNumber(kind);
+        const title = kind==='devis' ? 'Devis' : 'Facture';
+        const html = `<div style="padding:20px;background:#fff;color:#000">
+          <div style="display:flex;align-items:center;gap:10px"><div style="font-weight:800;color:#2563eb">${mainTitle.textContent}</div><div class="small">${title} ${num} - ${date}</div></div>
+          <h3 style="margin:10px 0">${title} - ${client}</h3>
+          <div>${objet}</div>
+          <div style="margin-top:10px">Montant HT: ${formatCurrency(ht)} | TVA (${tvaPct}%): ${formatCurrency(tva)} | Timbre: ${formatCurrency(timbre)}</div>
+          <div style="margin-top:6px"><strong>Total TTC: ${formatCurrency(ttc)}</strong></div>
+        </div>`;
+        const prev = document.getElementById('facturePreview'); if(prev) prev.innerHTML = html;
+        if(t.id==='printFactureBtn' && window.html2pdf){
+          const printable = document.getElementById('printable'); printable.innerHTML = html;
+          const opt = { margin:10, filename: `${title.toLowerCase()}-${client.replace(/\s+/g,'-')}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} };
+          html2pdf().from(printable).set(opt).save(); setTimeout(()=>{ printable.innerHTML=''; }, 400);
+        }
+      }
+    });
+
     // Export/Import
     exportBtn.addEventListener('click', () => {
       if (!currentCabinetId) {
@@ -4038,11 +4270,19 @@ LES ASSOCIÉS FONDATEURS :
       else if(t === 'societes') targetEl = document.getElementById('societesSection');
       else if(t === 'modeles') targetEl = document.getElementById('templatesCard');
       else if(t === 'cessions') targetEl = document.getElementById('cessionsCard');
+      else if(t === 'journaux') targetEl = document.getElementById('journauxSection');
+      else if(t === 'ecritures') targetEl = document.getElementById('ecrituresSection');
+      else if(t === 'pcm') targetEl = document.getElementById('pcmSection');
+      else if(t === 'etats') targetEl = document.getElementById('etatsSection');
+      else if(t === 'tva') targetEl = document.getElementById('tvaSection');
+      else if(t === 'paie') targetEl = document.getElementById('paieSection');
+      else if(t === 'facturation') targetEl = document.getElementById('facturationSection');
       else if(t === 'rappels') targetEl = Array.from(document.querySelectorAll('#app .card')).find(c=>/Rappels/i.test(c.innerText));
       else if(t === 'parametres') { alert('Paramètres bientôt disponibles'); return; }
       if(targetEl) targetEl.classList.remove('hidden');
       // On small screens, scroll to top of content
       window.scrollTo({top:0,behavior:'smooth'});
+      try{ if(t==='journaux') renderJournal(); if(t==='ecritures') renderEcritures(); if(t==='pcm') populatePcmDatalist(); }catch(_e){}
     });
   });
 
