@@ -16,6 +16,7 @@ from flask import (
     render_template,
     request,
     send_file,
+    send_from_directory,
     url_for,
 )
 from xhtml2pdf import pisa
@@ -74,6 +75,15 @@ def _df_to_excel_download(df: pd.DataFrame, filename: str) -> Response:
 @bp.route("/")
 def home() -> Response | str:
     return redirect(url_for("accounting.journals"))
+
+
+# ---------- Cabinet Page ----------
+
+
+@bp.route("/cabinet")
+def cabinet_page() -> Response:
+    # Serve the standalone Cabinet HTML as a static asset
+    return send_from_directory(current_app.static_folder, "cabinet.html")
 
 
 # ---------- Accounts (PCM) ----------
