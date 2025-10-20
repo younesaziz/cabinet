@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="title">Plan Comptable Marocain (PCM)</h1>
+<div class="mb-3">
+  <a class="button is-primary" href="{{ url_for('accounting.seed_pcm') }}">Importer PCM par défaut</a>
+  <form action="{{ url_for('accounting.import_accounts') }}" method="post" enctype="multipart/form-data" style="display:inline-block;">
+    <div class="field has-addons">
+      <div class="control">
+        <input class="input" type="file" name="file" accept=".csv" required>
+      </div>
+      <div class="control">
+        <button class="button is-link" type="submit">Importer CSV</button>
+      </div>
+    </div>
+  </form>
+</div>
+<table class="table is-fullwidth is-striped is-hoverable is-narrow">
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Intitulé</th>
+      <th>Classe</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in accounts %}
+    <tr>
+      <td class="is-mono">{{ a.code }}</td>
+      <td>{{ a.name }}</td>
+      <td>{{ a.class_code }}</td>
+      <td>{{ a.type }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

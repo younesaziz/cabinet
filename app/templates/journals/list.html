@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="title">Journaux comptables</h1>
+<table class="table is-fullwidth is-striped is-hoverable is-narrow">
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Nom</th>
+      <th>Type</th>
+      <th>Suivi</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for j in journals %}
+    <tr>
+      <td class="is-mono">{{ j.code }}</td>
+      <td>{{ j.name }}</td>
+      <td>{{ j.type }}</td>
+      <td class="is-mono">{{ j.prefix }}{{ now().year if false else '' }}-{{ '%04d'|format(j.next_number) }}</td>
+      <td>
+        <a class="button is-small is-primary" href="{{ url_for('accounting.entry_new', journal_id=j.id) }}">Nouvelle écriture</a>
+        <a class="button is-small" href="{{ url_for('accounting.journal_export_xlsx', journal_id=j.id) }}">Export Excel</a>
+        <a class="button is-small" href="{{ url_for('accounting.journal_export_pdf', journal_id=j.id) }}">Export PDF</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
