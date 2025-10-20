@@ -421,6 +421,54 @@
       .societe-actions{flex-direction:column}
       .societe-action-btn{width:100%}
     }
+
+    /* --- Finance-inspired additions (Varicent / Big Tech vibe) --- */
+    :root{
+      --success:#16a34a;
+      --warning:#f59e0b;
+      --danger:#dc2626;
+      --info:#0ea5e9;
+      --surface-1:var(--card);
+      --surface-2:rgba(2,6,23,0.04);
+      --surface-3:rgba(2,6,23,0.06);
+      --kpi-up:#16a34a;
+      --kpi-down:#dc2626;
+    }
+    [data-theme="dark"]{
+      --surface-2:rgba(255,255,255,0.03);
+      --surface-3:rgba(255,255,255,0.06);
+    }
+
+    /* Global search input (for header bar) */
+    .search-input{min-width:220px;background:transparent;border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:14px}
+    .search-input:focus-visible{outline:none;border-color:rgba(37,99,235,0.55);box-shadow:0 0 0 3px var(--ring)}
+
+    /* KPI cards */
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;margin-top:10px}
+    .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:12px}
+    .kpi-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, rgba(37,99,235,0.15), rgba(37,99,235,0.05));color:var(--accent);font-size:16px}
+    .kpi-content{flex:1}
+    .kpi-label{font-size:12px;color:var(--muted)}
+    .kpi-value{font-size:20px;font-weight:700}
+    .kpi-trend{font-size:12px}
+    .kpi-trend.up{color:var(--kpi-up)}
+    .kpi-trend.down{color:var(--kpi-down)}
+
+    /* Chart + analytics cards */
+    .grid-2{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:10px}
+    .chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow-md)}
+    .chart-placeholder{height:220px;border-radius:10px;background:linear-gradient(180deg, var(--surface-2), transparent), repeating-linear-gradient(0deg, transparent, transparent 28px, var(--border) 29px, transparent 30px);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+
+    /* Transactions table */
+    .transactions-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow-md)}
+    .transactions-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+    .transactions-table th,.transactions-table td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
+    .transactions-table tbody tr:hover{background:rgba(37,99,235,0.05)}
+    [data-theme="dark"] .transactions-table tbody tr:hover{background:rgba(59,130,246,0.08)}
+
+    @media (max-width: 600px){
+      .chart-placeholder{height:160px}
+    }
   </style>
   <!-- Performance & theming -->
   <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)">
@@ -502,6 +550,13 @@ body{font-family:Inter,'Poppins',system-ui,Segoe UI,Roboto,Arial;background:var(
       <a href="#" data-target="societes"><span class="ico">🏛️</span><span class="label">Sociétés</span></a>
       <a href="#" data-target="modeles"><span class="ico">📄</span><span class="label">Modèles</span></a>
       <a href="#" data-target="cessions"><span class="ico">🔁</span><span class="label">Cessions</span></a>
+      <a href="#" data-target="journaux"><span class="ico">📘</span><span class="label">Journaux</span></a>
+      <a href="#" data-target="ecritures"><span class="ico">🧾</span><span class="label">Écritures</span></a>
+      <a href="#" data-target="pcm"><span class="ico">📚</span><span class="label">Plan comptable</span></a>
+      <a href="#" data-target="etats"><span class="ico">📊</span><span class="label">États</span></a>
+      <a href="#" data-target="tva"><span class="ico">🧮</span><span class="label">TVA</span></a>
+      <a href="#" data-target="paie"><span class="ico">👥</span><span class="label">Paie</span></a>
+      <a href="#" data-target="facturation"><span class="ico">🧾</span><span class="label">Facturation</span></a>
       <a href="#" data-target="rappels"><span class="ico">⏰</span><span class="label">Rappels</span></a>
       <a href="#" data-target="parametres"><span class="ico">⚙️</span><span class="label">Paramètres</span></a>
     </nav>
@@ -515,11 +570,12 @@ body{font-family:Inter,'Poppins',system-ui,Segoe UI,Roboto,Arial;background:var(
   <main class="content-wrap">
     <!-- The original container will follow here -->
 
-  <div class="container">
+  <div class="container" id="printable">
     <header>
       <div class="header-top">
-        <h1 id="mainTitle">Cabinet Comptable </h1>
+        <h1 id="mainTitle">FinOps Cabinet</h1>
         <div class="topbar">
+          <input id="globalSearch" class="search-input" placeholder="Rechercher sociétés, modèles..." />
           <div class="cabinet-selector">
             <label class="small">Cabinet</label>
             <select id="cabinetSelect" style="max-width:150px">
@@ -597,12 +653,12 @@ body{font-family:Inter,'Poppins',system-ui,Segoe UI,Roboto,Arial;background:var(
         </div>
       </div>
 
-      <!-- Dashboard Card -->
+      <!-- Dashboard Card (Big Tech-inspired finance layout) -->
       <div class="card" id="dashboard">
         <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px">
           <div>
             <h2 style="margin:0" id="dashboardTitle">Tableau de bord</h2>
-            <p class="small muted" style="margin:5px 0 0 0">Gérer les sociétés, modèles, cessions et rappels</p>
+            <p class="small muted" style="margin:5px 0 0 0">Vue d'ensemble: sociétés, rappels, modèles, cessions</p>
           </div>
           <div class="action-buttons">
             <button id="newCompanyBtn" class="btn">NV société</button>
@@ -612,25 +668,82 @@ body{font-family:Inter,'Poppins',system-ui,Segoe UI,Roboto,Arial;background:var(
             <button id="importBtn" class="btn ghost">Importer</button>
           </div>
         </div>
-        
         <div id="reminderNotice" class="notice hidden"></div>
-        
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-number" id="countCompanies">0</div>
-            <div class="stat-label">Sociétés</div>
+
+        <!-- KPI row -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon">🏢</div>
+            <div class="kpi-content">
+              <div class="kpi-label">Sociétés</div>
+              <div class="kpi-value" id="countCompanies">0</div>
+              <div class="kpi-trend up" id="companiesTrend">+0 ce mois</div>
+            </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-number" id="countReminders">0</div>
-            <div class="stat-label">Rappels</div>
+          <div class="kpi-card">
+            <div class="kpi-icon">⏰</div>
+            <div class="kpi-content">
+              <div class="kpi-label">Rappels</div>
+              <div class="kpi-value" id="countReminders">0</div>
+              <div class="kpi-trend down" id="remindersTrend">0 dûs</div>
+            </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-number" id="countTemplates">0</div>
-            <div class="stat-label">Modèles</div>
+          <div class="kpi-card">
+            <div class="kpi-icon">📄</div>
+            <div class="kpi-content">
+              <div class="kpi-label">Modèles</div>
+              <div class="kpi-value" id="countTemplates">0</div>
+              <div class="kpi-trend" id="templatesTrend">—</div>
+            </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-number" id="countCessions">0</div>
-            <div class="stat-label">Cessions</div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🔁</div>
+            <div class="kpi-content">
+              <div class="kpi-label">Cessions</div>
+              <div class="kpi-value" id="countCessions">0</div>
+              <div class="kpi-trend up" id="cessionsTrend">+0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analytics row -->
+        <div class="grid-2" style="margin-top:10px">
+          <div class="chart-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <h4 style="margin:0">Flux d'activité</h4>
+              <span class="pill">30 jours</span>
+            </div>
+            <div class="chart-placeholder">Graphique ligne (placeholder)</div>
+          </div>
+          <div class="chart-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <h4 style="margin:0">Répartition par type</h4>
+              <span class="pill">Sociétés</span>
+            </div>
+            <div class="chart-placeholder">Graphique barres (placeholder)</div>
+          </div>
+        </div>
+
+        <!-- Transactions list -->
+        <div class="transactions-card" style="margin-top:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <h4 style="margin:0">Dernières activités</h4>
+            <button id="viewAllActivity" class="btn ghost small">Tout voir</button>
+          </div>
+          <div class="table-container">
+            <table class="transactions-table" id="activityTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Détail</th>
+                  <th>Montant</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Filled dynamically -->
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -1026,6 +1139,163 @@ body{font-family:Inter,'Poppins',system-ui,Segoe UI,Roboto,Arial;background:var(
         <div id="remindersList"></div>
       </div>
 
+      <!-- Journaux comptables -->
+      <div id="journauxSection" class="card hidden">
+        <h3>Journaux comptables</h3>
+        <div class="form-grid cols-2">
+          <div>
+            <label>Type de journal</label>
+            <select id="journalType">
+              <option value="ACHATS">Journal des achats</option>
+              <option value="VENTES">Journal des ventes</option>
+              <option value="TRESORERIE">Journal de trésorerie</option>
+              <option value="OD">Opérations diverses</option>
+            </select>
+          </div>
+          <div>
+            <label>Période</label>
+            <input id="journalPeriod" placeholder="YYYY-MM" />
+          </div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px">
+          <button id="addJournalEntryBtn" class="btn">Ajouter écriture</button>
+          <button id="exportJournalExcelBtn" class="btn ghost">Export Excel</button>
+          <button id="exportJournalPdfBtn" class="btn ghost">Export PDF</button>
+        </div>
+        <div class="table-container" style="margin-top:10px">
+          <table class="transactions-table" id="journalTable">
+            <thead>
+              <tr>
+                <th>N°</th><th>Date</th><th>Pièce</th><th>Libellé</th><th>Compte Débit</th><th>Compte Crédit</th><th>Montant</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Plan Comptable Marocain -->
+      <div id="pcmSection" class="card hidden">
+        <h3>Plan Comptable Marocain (PCM)</h3>
+        <p class="small muted">Classes 1 à 8. Saisie assistée via liste déroulante.</p>
+        <div id="pcmList" class="list" style="max-height:320px"></div>
+      </div>
+
+      <!-- Écritures comptables -->
+      <div id="ecrituresSection" class="card hidden">
+        <h3>Écritures comptables</h3>
+        <div class="form-grid cols-2">
+          <div>
+            <label>Date</label>
+            <input id="ecritureDate" type="date" />
+          </div>
+          <div>
+            <label>Libellé</label>
+            <input id="ecritureLibelle" placeholder="Description de l'opération" />
+          </div>
+          <div>
+            <label>Compte Débit</label>
+            <input id="ecritureDebit" list="pcmAccounts" placeholder="Ex: 3451" />
+          </div>
+          <div>
+            <label>Compte Crédit</label>
+            <input id="ecritureCredit" list="pcmAccounts" placeholder="Ex: 7111" />
+          </div>
+          <div>
+            <label>Montant</label>
+            <input id="ecritureMontant" type="number" step="0.01" />
+          </div>
+          <div>
+            <label>Référence pièce</label>
+            <input id="ecritureRef" placeholder="N° facture / pièce" />
+          </div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px">
+          <button id="saveEcritureBtn" class="btn">Enregistrer</button>
+          <button id="clearEcritureBtn" class="btn ghost">Effacer</button>
+        </div>
+        <datalist id="pcmAccounts"></datalist>
+        <div class="table-container" style="margin-top:10px">
+          <table class="transactions-table" id="ecrituresTable">
+            <thead><tr><th>N°</th><th>Date</th><th>Libellé</th><th>Débit</th><th>Crédit</th><th>Montant</th><th>Pièce</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- États financiers -->
+      <div id="etatsSection" class="card hidden">
+        <h3>États financiers</h3>
+        <div class="grid-2">
+          <div class="chart-card"><h4 style="margin:0">Bilan</h4><div class="chart-placeholder">Bilan (auto)</div></div>
+          <div class="chart-card"><h4 style="margin:0">Compte de résultat</h4><div class="chart-placeholder">CR (auto)</div></div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px">
+          <button id="exportBalanceExcelBtn" class="btn ghost">Balance Excel</button>
+          <button id="exportGrandLivrePdfBtn" class="btn ghost">Grand livre PDF</button>
+        </div>
+      </div>
+
+      <!-- TVA -->
+      <div id="tvaSection" class="card hidden">
+        <h3>Gestion TVA</h3>
+        <div class="form-grid cols-2">
+          <div>
+            <label>Période</label>
+            <input id="tvaPeriod" placeholder="YYYY-MM" />
+          </div>
+          <div>
+            <label>Périodicité</label>
+            <select id="tvaFrequency"><option value="M">Mensuelle</option><option value="T">Trimestrielle</option></select>
+          </div>
+          <div>
+            <label>TVA collectée (ventes)</label>
+            <input id="tvaOutput" type="number" step="0.01" />
+          </div>
+          <div>
+            <label>TVA déductible (achats)</label>
+            <input id="tvaInput" type="number" step="0.01" />
+          </div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px">
+          <button id="calcTvaBtn" class="btn">Calculer</button>
+          <button id="exportTvaPdfBtn" class="btn ghost">Export déclaration</button>
+        </div>
+        <div id="tvaResult" class="notice" style="margin-top:10px"></div>
+      </div>
+
+      <!-- Paie (optionnel) -->
+      <div id="paieSection" class="card hidden">
+        <h3>Paie & CNSS (optionnel)</h3>
+        <div class="form-grid cols-2">
+          <div><label>Employé</label><input id="paieEmployee" placeholder="Nom complet" /></div>
+          <div><label>Salaire brut</label><input id="paieBrut" type="number" step="0.01" /></div>
+          <div><label>CNSS</label><input id="paieCnss" type="number" step="0.01" /></div>
+          <div><label>AMO</label><input id="paieAmo" type="number" step="0.01" /></div>
+          <div><label>IR</label><input id="paieIr" type="number" step="0.01" /></div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px"><button id="calcPaieBtn" class="btn">Calculer net</button></div>
+        <div id="paieResult" class="notice" style="margin-top:10px"></div>
+      </div>
+
+      <!-- Facturation -->
+      <div id="facturationSection" class="card hidden">
+        <h3>Facturation</h3>
+        <div class="form-grid cols-2">
+          <div><label>Client</label><input id="factClient" placeholder="Nom du client" /></div>
+          <div><label>Date</label><input id="factDate" type="date" /></div>
+          <div><label>Objet</label><input id="factObjet" placeholder="Objet du devis/facture" /></div>
+          <div><label>Montant HT</label><input id="factMontantHT" type="number" step="0.01" /></div>
+          <div><label>TVA (%)</label><input id="factTVA" type="number" value="20" step="0.01" /></div>
+          <div><label>Timbre fiscal</label><input id="factTimbre" type="number" value="0.6" step="0.01" /></div>
+        </div>
+        <div class="action-buttons" style="margin-top:10px">
+          <button id="genDevisBtn" class="btn">Créer devis</button>
+          <button id="genFactureBtn" class="btn ghost">Créer facture</button>
+          <button id="printFactureBtn" class="btn ghost">Imprimer PDF</button>
+        </div>
+        <div id="facturePreview" class="notice" style="margin-top:10px"></div>
+      </div>
     </div>
 
     <div style="margin-top:20px;text-align:center;color:var(--muted);font-size:12px;padding:0 10px">
@@ -1362,6 +1632,20 @@ LES FONDATEURS :
       themeSelect.value = theme;
       // init locale
       localeSelect.value = `${activeLocale}|${activeCurrency}`;
+      // hook global search
+      const globalSearch = document.getElementById('globalSearch');
+      if (globalSearch) {
+        globalSearch.addEventListener('input', (e)=>{
+          const q = String(e.target.value||'').toLowerCase();
+          // filter companies live
+          const list = getCurrentCabinetCompanies().filter(c=>{
+            return [c.name,c.rc,c.ice,c.manager]
+              .filter(Boolean)
+              .some(v=>String(v).toLowerCase().includes(q));
+          });
+          renderCompaniesTable(list);
+        });
+      }
 
       // Fill legal types
       legalType.innerHTML = '';
@@ -2609,6 +2893,34 @@ Les Associés :
       countReminders.textContent = currentReminders.length;
       countTemplates.textContent = currentTemplates.length;
       countCessions.textContent = currentCessions.length;
+      // simple trends and activity feed
+      const companiesTrend = document.getElementById('companiesTrend');
+      const remindersTrend = document.getElementById('remindersTrend');
+      const templatesTrend = document.getElementById('templatesTrend');
+      const cessionsTrend = document.getElementById('cessionsTrend');
+      if (companiesTrend) companiesTrend.textContent = `+${currentCompanies.length} total`;
+      if (remindersTrend) remindersTrend.textContent = `${currentReminders.length} dûs`;
+      if (templatesTrend) templatesTrend.textContent = `${currentTemplates.length} disponibles`;
+      if (cessionsTrend) cessionsTrend.textContent = `+${currentCessions.length}`;
+
+      const activityTable = document.getElementById('activityTable');
+      if (activityTable) {
+        const tbody = activityTable.querySelector('tbody');
+        tbody.innerHTML = '';
+        const recent = [];
+        currentCompanies.slice(-3).forEach(c=>{
+          recent.push({date: c.date || todayISO(), type: 'Société', detail: c.name, amount: c.capital ? formatCurrency(c.capital) : '—'});
+        });
+        currentCessions.slice(-3).forEach(cs=>{
+          recent.push({date: cs.date || todayISO(), type: 'Cession', detail: cs.companyName || '—', amount: cs.price ? formatCurrency(cs.price) : '—'});
+        });
+        recent.sort((a,b)=> new Date(b.date) - new Date(a.date));
+        recent.slice(0,6).forEach(r=>{
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${formatDateISO(r.date)}</td><td>${r.type}</td><td>${r.detail}</td><td>${r.amount}</td>`;
+          tbody.appendChild(tr);
+        });
+      }
     }
 
     // Authentication
