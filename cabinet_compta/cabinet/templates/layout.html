@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Cabinet de Comptabilité{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  {% block head %}{% endblock %}
+  <style>
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;}
+    .container{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+    aside{background:#111827;color:#fff;padding:20px}
+    aside a{color:#cbd5e1;text-decoration:none;display:block;padding:8px 0}
+    main{padding:24px}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:16px}
+    [data-theme="dark"] body{background:#0d1117;color:#c9d1d9}
+  </style>
+</head>
+<body>
+<div class="container">
+  <aside>
+    <h2 style="margin-top:0">Cabinet</h2>
+    <nav>
+      <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+      <a href="{{ url_for('cabinets.index') }}">Cabinets</a>
+      <a href="{{ url_for('societes.index') }}">Sociétés</a>
+      <a href="{{ url_for('templates.index') }}">Modèles</a>
+      <a href="{{ url_for('cessions.index') }}">Cessions</a>
+      <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </nav>
+  </aside>
+  <main>
+    <header>
+      <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+      <div>
+        <button id="themeToggle">🌓</button>
+      </div>
+    </header>
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<script>
+  document.getElementById('themeToggle').addEventListener('click',function(){
+    const html=document.documentElement;html.dataset.theme=html.dataset.theme==='dark'?'light':'dark';
+  });
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
